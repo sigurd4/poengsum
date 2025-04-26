@@ -52,30 +52,24 @@ impl Display for Error
         let rules = format!(
             "Each line of \"{POENGSUM_PATH}\" must be on the form `<team>: <points...>`\nOne team on each line, followed by a ':', then the team's points for each round separated by whitespace.\nExample: \"Quizzbuzz: 12 25 9\""
         );
+        let io_hint = |error: &std::io::Error, other: &str| match error.kind()
+        {
+            ErrorKind::NotFound => format!("\nIf it doesn't exist, create it!\n\n{rules}"),
+            ErrorKind::PermissionDenied => "\nYou don't have permission to view this file.".to_string(),
+            ErrorKind::IsADirectory => format!("\nThere's, for some reason, a directory with the same name as {POENGSUM_PATH}.\nThis program needs {POENGSUM_PATH} to be a file, not a directory."),
+            ErrorKind::Other => other.to_string(),
+            _ => "".to_string(),
+        };
         match self
         {
             Self::CannotOpenFile { error } => {
-                let hint = match error.kind()
-                {
-                    ErrorKind::NotFound => format!("\nIf it doesn't exist, create it!\n\n{rules}"),
-                    ErrorKind::PermissionDenied => "\nYou don't have permission to view this file.".to_string(),
-                    ErrorKind::IsADirectory => format!("\nThere's, for some reason, a directory with the same name as {POENGSUM_PATH}.\nThis program needs {POENGSUM_PATH} to be a file, not a directory."),
-                    ErrorKind::Other => "\nOops!".to_string(),
-                    _ => "".to_string(),
-                };
+                let hint = io_hint(error, "\nOops!");
                 write!(f,
                     "Cannot open file \"{POENGSUM_PATH}\".\n{error}.{hint}"
                 )
             },
             Self::CannotReadFile { row, error } => {
-                let hint = match error.kind()
-                {
-                    ErrorKind::NotFound => "\nIf it doesn't exist, create it!",
-                    ErrorKind::PermissionDenied => "\nYou don't have permission to view this file.",
-                    ErrorKind::IsADirectory => "\nThat's not a file. That's a directory!",
-                    ErrorKind::Other => "\nMaybe the file is just busy?",
-                    _ => "",
-                };
+                let hint = io_hint(error, "\nMaybe the file is just busy?");
                 write!(f,
                     "Cannot read line {row} in file \"{POENGSUM_PATH}\".\n{error}.{hint}"
                 )
