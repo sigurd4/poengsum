@@ -57,7 +57,7 @@ impl Display for Error
             Self::CannotOpenFile { error } => {
                 let hint = match error.kind()
                 {
-                    ErrorKind::NotFound => format!("\nIf it doesn't exist, create it!\n\n{}", rules),
+                    ErrorKind::NotFound => format!("\nIf it doesn't exist, create it!\n\n{rules}"),
                     ErrorKind::PermissionDenied => "\nYou don't have permission to view this file.".to_string(),
                     ErrorKind::IsADirectory => format!("\nThere's, for some reason, a directory with the same name as {POENGSUM_PATH}.\nThis program needs {POENGSUM_PATH} to be a file, not a directory."),
                     ErrorKind::Other => "\nOops!".to_string(),
