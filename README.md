@@ -19,7 +19,7 @@ A very simple CLI tool that counts points and keeps track of teams competing in 
 
 You write the score of each team in a file called `poengsum.txt`, like in this example:
 
-```json
+```txt
 Nester Grønn: 13 20
 Det klør på quizzen: 6 12
 Brew wars: Return of the Heimert: 6 29 9
