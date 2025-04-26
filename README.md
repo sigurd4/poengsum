@@ -1,8 +1,5 @@
 [![Build Status (nightly)](https://github.com/sigurd4/poengsum/workflows/Build-nightly/badge.svg)](https://github.com/sigurd4/poengsum/actions/workflows/build-nightly.yml)
-[![Build Status (nightly, all features)](https://github.com/sigurd4/poengsum/workflows/Build-nightly-all-features/badge.svg)](https://github.com/sigurd4/poengsum/actions/workflows/build-nightly-all-features.yml)
-
 [![Build Status (stable)](https://github.com/sigurd4/poengsum/workflows/Build-stable/badge.svg)](https://github.com/sigurd4/poengsum/actions/workflows/build-stable.yml)
-[![Build Status (stable, all features)](https://github.com/sigurd4/poengsum/workflows/Build-stable-all-features/badge.svg)](https://github.com/sigurd4/poengsum/actions/workflows/build-stable-all-features.yml)
 
 [![Test Status](https://github.com/sigurd4/poengsum/workflows/Test/badge.svg)](https://github.com/sigurd4/poengsum/actions/workflows/test.yml)
 [![Lint Status](https://github.com/sigurd4/poengsum/workflows/Lint/badge.svg)](https://github.com/sigurd4/poengsum/actions/workflows/lint.yml)
