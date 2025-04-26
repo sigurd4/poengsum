@@ -1,6 +1,8 @@
 #![feature(iterator_try_collect)]
 #![feature(unsigned_signed_diff)]
 
+use std::env::Args;
+
 use error::Error;
 use record::Record;
 use score::Score;
@@ -17,26 +19,25 @@ const POENGSUM_PATH: &str = "./poengsum.txt";
 
 fn main()
 {
-    if let Err(error) = run()
+    if let Err(error) = run(std::env::args())
     {
         eprintln!("Error: {error:?}\n\n{error}")
     }
 }
 
-fn run() -> Result<(), Error>
+fn run(args: impl Iterator<Item = String>) -> Result<(), Error>
 {
     let records = Record::read()?;
 
-    let scores = Score::scores(records, parse_args()?)?;
+    let scores = Score::scores(records, parse_args(args)?)?;
 
     Score::present(scores);
 
     Ok(())
 }
 
-fn parse_args() -> Result<Option<Vec<usize>>, Error>
+fn parse_args(mut args: impl Iterator<Item = String>) -> Result<Option<Vec<usize>>, Error>
 {
-    let mut args = std::env::args();
     let _ = args.next();
 
     let rounds = args
@@ -51,4 +52,27 @@ fn parse_args() -> Result<Option<Vec<usize>>, Error>
         .try_collect::<Vec<_>>()?;
 
     Ok(if !rounds.is_empty() { Some(rounds) } else { None })
+}
+
+#[cfg(test)]
+mod tests
+{
+    use crate::error::Error;
+
+    #[test]
+    fn it_works() -> Result<(), Error>
+    {
+        crate::run(["poengsum"].into_iter().map(String::from))?;
+
+        crate::run(["poengsum", "1"].into_iter().map(String::from))?;
+        crate::run(["poengsum", "2"].into_iter().map(String::from))?;
+        crate::run(["poengsum", "3"].into_iter().map(String::from))?;
+
+        crate::run(["poengsum", "1", "2"].into_iter().map(String::from))?;
+        crate::run(["poengsum", "2", "3"].into_iter().map(String::from))?;
+
+        crate::run(["poengsum", "1", "2", "3"].into_iter().map(String::from))?;
+
+        Ok(())
+    }
 }
