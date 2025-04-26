@@ -170,7 +170,8 @@ impl Score
                 {
                     if prev_score.uid == score.uid
                     {
-                        score.climb = i.checked_signed_diff(j).unwrap_or(0)
+                        //score.climb = i.checked_signed_diff(j).unwrap_or(0)
+                        score.climb = crate::checked_signed_diff(i, j).unwrap_or(0)
                     }
                 }
             }

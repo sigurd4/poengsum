@@ -1,6 +1,3 @@
-#![feature(iterator_try_collect)]
-#![feature(unsigned_signed_diff)]
-
 use error::Error;
 use record::Record;
 use score::Score;
@@ -12,6 +9,18 @@ moddef::moddef!(
         score
     }
 );
+
+fn checked_signed_diff(lhs: usize, rhs: usize) -> Option<isize>
+{
+    let res = lhs.wrapping_sub(rhs) as isize;
+    let overflow = (lhs >= rhs) == (res < 0);
+
+    if !overflow {
+        Some(res)
+    } else {
+        None
+    }
+}
 
 const POENGSUM_PATH: &str = "./poengsum.txt";
 
@@ -38,7 +47,9 @@ fn parse_args(mut args: impl Iterator<Item = String>) -> Result<Option<Vec<usize
 {
     let _ = args.next();
 
-    let rounds = args
+    let mut rounds = Vec::new();
+    
+    for round in args
         .enumerate()
         .map(|(i, arg)| {
             let no = i + 1;
@@ -47,7 +58,10 @@ fn parse_args(mut args: impl Iterator<Item = String>) -> Result<Option<Vec<usize
                 .checked_sub(1)
                 .ok_or(Error::RoundZero { no })
         })
-        .try_collect::<Vec<_>>()?;
+        /*.try_collect::<Vec<_>>()?*/
+    {
+        rounds.push(round?);
+    }
 
     Ok(if !rounds.is_empty() { Some(rounds) } else { None })
 }
