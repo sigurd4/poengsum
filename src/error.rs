@@ -57,27 +57,27 @@ impl Display for Error
             Self::CannotOpenFile { error } => {
                 let hint = match error.kind()
                 {
-                    ErrorKind::NotFound => "If it doesn't exist, create it!",
-                    ErrorKind::PermissionDenied => "You don't have permission to view this file.",
-                    ErrorKind::IsADirectory => "That's not a file. That's a directory!",
-                    ErrorKind::Other => "Oops!",
-                    _ => "",
+                    ErrorKind::NotFound => format!("\nIf it doesn't exist, create it!\n\n{}", rules),
+                    ErrorKind::PermissionDenied => "\nYou don't have permission to view this file.".to_string(),
+                    ErrorKind::IsADirectory => format!("\nThere's, for some reason, a directory with the same name as {POENGSUM_PATH}.\nThis program needs {POENGSUM_PATH} to be a file, not a directory."),
+                    ErrorKind::Other => "\nOops!".to_string(),
+                    _ => "".to_string(),
                 };
                 write!(f,
-                    "Cannot open file \"{POENGSUM_PATH}\".\n{error}.\n{hint}"
+                    "Cannot open file \"{POENGSUM_PATH}\".\n{error}.{hint}"
                 )
             },
             Self::CannotReadFile { row, error } => {
                 let hint = match error.kind()
                 {
-                    ErrorKind::NotFound => "If it doesn't exist, create it!",
-                    ErrorKind::PermissionDenied => "You don't have permission to view this file.",
-                    ErrorKind::IsADirectory => "That's not a file. That's a directory!",
-                    ErrorKind::Other => "Maybe the file is just busy?",
+                    ErrorKind::NotFound => "\nIf it doesn't exist, create it!",
+                    ErrorKind::PermissionDenied => "\nYou don't have permission to view this file.",
+                    ErrorKind::IsADirectory => "\nThat's not a file. That's a directory!",
+                    ErrorKind::Other => "\nMaybe the file is just busy?",
                     _ => "",
                 };
                 write!(f,
-                    "Cannot read line {row} in file \"{POENGSUM_PATH}\".\n{error}.\n{hint}"
+                    "Cannot read line {row} in file \"{POENGSUM_PATH}\".\n{error}.{hint}"
                 )
             },
             Self::MissingColon { row, line } => write!(f,

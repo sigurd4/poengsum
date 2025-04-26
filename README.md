@@ -10,7 +10,8 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/sigurd4/poengsum)](https://app.codecov.io/github/sigurd4/poengsum)
 
 # poengsum
-A very simple CLI tool that counts points and keeps track of teams competing in a quiz.
+
+Quickly generate a leaderboard for a quiz in the terminal.
 
 ## Input
 
@@ -43,7 +44,9 @@ The program will then parse this file when ran in the same directory, and gives 
 
 You can then display the leaderboard for the total sum of all rounds thus far by entering `poengsum` in the terminal, in the same directory as `poengsum.txt`.
 
-`$ poengsum`
+```bash
+poengsum
+```
 ```
 16. Det klør på quizzen: 18
 15. 2. Etg.: 22
@@ -69,7 +72,9 @@ You can also specify a specific sequence of rounds as command-line arguments to 
 
 For example, if i want to see how it would have played out if round 2 happened first, and then round 1 happened twice, i can do this:
 
-`$ poengsum 2 1 1`
+```bash
+poengsum 2 1 1
+```
 ```
 16. Det klør på quizzen: 24
 15. 2. Etg.: 34
@@ -97,8 +102,16 @@ How convenient!
 
 You can install this program from [crates.io](https://crates.io) through [Cargo](https://www.rust-lang.org/tools/install), by running this command in your command-line:
 
-```
-$ cargo install poengsum
+```bash
+cargo install poengsum
 ```
 
 This will by default install the application to the directory `~/.cargo/bin/`. Make sure `~/.cargo/bin/` is included in your `PATH`.
+
+### Arch-linux (AUR)
+
+This program is also available on the AUR under the name [poengsum](https://aur.archlinux.org/packages/poengsum). If you're running an Arch-based distro, you can get it there.
+
+```bash
+yay -S poengsum
+```
