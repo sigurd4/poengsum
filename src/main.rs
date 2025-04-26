@@ -1,8 +1,6 @@
 #![feature(iterator_try_collect)]
 #![feature(unsigned_signed_diff)]
 
-use std::env::Args;
-
 use error::Error;
 use record::Record;
 use score::Score;
