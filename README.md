@@ -40,6 +40,8 @@ Null peiling: 11 13
 
 Each line contains one team, followed by a colon, and then whitespace separated point values for each round. Team names can include a colon. The points follow the last colon on each line. Teams that have not participated in all rounds will have a score of 0 in those rounds they were not participating in. It supports UTF-8.
 
+The program will then parse this file when ran in the same directory, and gives helpful and easy-to-understand error messages if issues arise with reading or parsing it.
+
 ## Output
 
 You can then display the leaderboard for the total sum of all rounds thus far by entering `poengsum` in the terminal, in the same directory as `poengsum.txt`.
