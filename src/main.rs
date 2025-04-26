@@ -15,11 +15,7 @@ fn checked_signed_diff(lhs: usize, rhs: usize) -> Option<isize>
     let res = lhs.wrapping_sub(rhs) as isize;
     let overflow = (lhs >= rhs) == (res < 0);
 
-    if !overflow {
-        Some(res)
-    } else {
-        None
-    }
+    if !overflow { Some(res) } else { None }
 }
 
 const POENGSUM_PATH: &str = "./poengsum.txt";
@@ -48,17 +44,15 @@ fn parse_args(mut args: impl Iterator<Item = String>) -> Result<Option<Vec<usize
     let _ = args.next();
 
     let mut rounds = Vec::new();
-    
-    for round in args
-        .enumerate()
-        .map(|(i, arg)| {
-            let no = i + 1;
-            arg.parse::<usize>()
-                .map_err(|error| Error::CannotParseRound { no, arg, error })?
-                .checked_sub(1)
-                .ok_or(Error::RoundZero { no })
-        })
-        /*.try_collect::<Vec<_>>()?*/
+
+    for round in args.enumerate().map(|(i, arg)| {
+        let no = i + 1;
+        arg.parse::<usize>()
+            .map_err(|error| Error::CannotParseRound { no, arg, error })?
+            .checked_sub(1)
+            .ok_or(Error::RoundZero { no })
+    })
+    /* .try_collect::<Vec<_>>()? */
     {
         rounds.push(round?);
     }
