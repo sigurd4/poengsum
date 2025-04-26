@@ -1,7 +1,14 @@
 [package]
 name = "poengsum"
 version = "0.1.0"
+authors = ["Sigurd Sætherø Spangelo"]
 edition = "2024"
+license = "MIT"
+description = "A very simple CLI tool that counts points and keeps track of teams competing in a quiz."
+repository = "https://github.com/sigurd4/poengsum"
+keywords = ["game", "quiz", "points", "cli", "terminal"]
+categories = ["algorithms", "mathematics", "multimedia::audio", "no-std::no-alloc"]
+exclude = ["plots/"]
 
 [dependencies]
 thiserror = "2.0.12"
