@@ -19,7 +19,7 @@ fn main()
 {
     if let Err(error) = run(std::env::args())
     {
-        eprintln!("Error: {error:?}\n\n{error}")
+        eprintln!("Error: {error}")
     }
 }
 
