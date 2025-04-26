@@ -38,7 +38,7 @@ De anonyme: 11 13
 Null peiling: 11 13
 ```
 
-Each line contains one team, followed by a colon, and then whitespace separated point values for each round. Team names can include a colon. The points follow the last colon on each line. Teams that have not participated in all rounds will have a score of 0 in those rounds they were not participating in.
+Each line contains one team, followed by a colon, and then whitespace separated point values for each round. Team names can include a colon. The points follow the last colon on each line. Teams that have not participated in all rounds will have a score of 0 in those rounds they were not participating in. It supports UTF-8.
 
 ## Output
 
