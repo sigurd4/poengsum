@@ -93,3 +93,15 @@ For example, if i want to see how it would have played out if round 2 happened f
 ```
 
 How convenient!
+
+## Installation
+
+### Cargo
+
+You can install this program from [crates.io](https://crates.io) through [Cargo](https://www.rust-lang.org/tools/install), by running this command in your command-line:
+
+```
+$ cargo install poengsum
+```
+
+This will by default install the application to the directory `~/.cargo/bin/`. Make sure `~/.cargo/bin/` is included in your `PATH`.
