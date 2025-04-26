@@ -6,9 +6,8 @@ edition = "2024"
 license = "MIT"
 description = "A very simple CLI tool that counts points and keeps track of teams competing in a quiz."
 repository = "https://github.com/sigurd4/poengsum"
-keywords = ["game", "quiz", "points", "cli", "terminal"]
-categories = ["algorithms", "mathematics", "multimedia::audio", "no-std::no-alloc"]
-exclude = ["plots/"]
+keywords = ["game", "quiz", "utility", "cli", "terminal"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 thiserror = "2.0.12"
