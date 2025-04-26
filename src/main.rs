@@ -13,13 +13,13 @@ moddef::moddef!(
     }
 );
 
-const POENGSUM_PATH: &'static str = "./poengsum.txt";
+const POENGSUM_PATH: &str = "./poengsum.txt";
 
 fn main()
 {
     if let Err(error) = run()
     {
-        eprintln!("Error: {0:?}\n\n{0}", error)
+        eprintln!("Error: {error:?}\n\n{error}")
     }
 }
 
@@ -34,35 +34,21 @@ fn run() -> Result<(), Error>
     Ok(())
 }
 
-fn parse_args() -> Result<Option<Vec<usize>>,  Error>
+fn parse_args() -> Result<Option<Vec<usize>>, Error>
 {
     let mut args = std::env::args();
     let _ = args.next();
 
-    let rounds = args.into_iter()
+    let rounds = args
         .enumerate()
         .map(|(i, arg)| {
             let no = i + 1;
             arg.parse::<usize>()
-                .map_err(|error| Error::CannotParseRound {
-                    no,
-                    arg,
-                    error
-                })?
+                .map_err(|error| Error::CannotParseRound { no, arg, error })?
                 .checked_sub(1)
-                .ok_or(Error::RoundZero {
-                    no
-                })
-        }).try_collect::<Vec<_>>()?;
+                .ok_or(Error::RoundZero { no })
+        })
+        .try_collect::<Vec<_>>()?;
 
-    Ok(
-        if !rounds.is_empty()
-        {
-            Some(rounds)
-        }
-        else
-        {
-            None
-        }
-    )
+    Ok(if !rounds.is_empty() { Some(rounds) } else { None })
 }

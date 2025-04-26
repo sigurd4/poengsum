@@ -33,7 +33,7 @@ impl Record
                 })? != 0
         }
         {
-            if line.trim().len() == 0
+            if line.trim().is_empty()
             {
                 continue
             }

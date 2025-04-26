@@ -49,11 +49,11 @@ impl Score
     
         for score in scores
         {
-            println!("{}", score);
+            println!("{score}");
         }
     }
 
-    fn sort<T>(scores: &mut Vec<T>, mut f: impl FnMut(&T) -> &Score, f_mut: impl FnMut(&mut T) -> &mut Score)
+    fn sort<T>(scores: &mut [T], mut f: impl FnMut(&T) -> &Score, f_mut: impl FnMut(&mut T) -> &mut Score)
     {
         scores.sort_by(|a, b| f(a).partial_cmp(f(b)).unwrap_or(Ordering::Equal));
 
@@ -84,7 +84,7 @@ impl Score
                 climb: 0,
                 plass: 0,
                 uid
-            }).collect();
+            }).collect::<Vec<_>>();
 
         Self::sort(&mut scores, |score| score, |score| score);
         scores
@@ -152,17 +152,11 @@ impl Score
     {
         Self::check_runder(&records, &runder)?;
 
-        let prev_scores = if let Some(runder_som_var) = Self::runder_som_var(&records, &runder)
-        {
-            Some(Self::scores_no_climb(
+        let prev_scores = Self::runder_som_var(&records, &runder)
+            .map(|runder_som_var| Self::scores_no_climb(
                 records.clone(),
                 Some(runder_som_var)
-            ))
-        }
-        else
-        {
-            None
-        };
+            ));
 
         let mut scores = Self::scores_no_climb(records, runder);
 
