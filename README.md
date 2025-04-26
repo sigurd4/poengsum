@@ -5,7 +5,7 @@
 [![Lint Status](https://github.com/sigurd4/poengsum/workflows/Lint/badge.svg)](https://github.com/sigurd4/poengsum/actions/workflows/lint.yml)
 
 [![Latest Version](https://img.shields.io/crates/v/poengsum.svg?logo=rust)](https://crates.io/crates/poengsum)
-![AUR Version](https://img.shields.io/aur/version/poengsum?logo=archlinux)
+[![AUR Version](https://img.shields.io/aur/version/poengsum?logo=archlinux)](https://aur.archlinux.org/packages/poengsum)
 
 [![License:MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Coverage Status](https://img.shields.io/codecov/c/github/sigurd4/poengsum)](https://app.codecov.io/github/sigurd4/poengsum)
