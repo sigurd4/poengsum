@@ -1,4 +1,4 @@
-use core::str::FromStr;
+use core::{num::ParseFloatError, ops::Range};
 
 use super::InvalidRead;
 
@@ -8,20 +8,19 @@ pub enum InvalidSyntax
     NoTeams,
     MissingColon {
         row: usize,
-        line: String,
+        line: Box<str>,
     },
     UnnamedTeam {
         row: usize,
-        line: String,
+        line: Box<str>,
     },
     CannotParsePoints {
         row: usize,
-        col: usize,
-        line: String,
-        span: String,
-        team: String,
         round: usize,
-        error: <f64 as FromStr>::Err
+        col: Range<usize>,
+        line: Box<str>,
+        team: Box<str>,
+        error: ParseFloatError
     },
 }
 

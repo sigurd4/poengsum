@@ -7,7 +7,7 @@ use crate::{error::InsufficientData, record::Records, round::{BoundedRounds, Rou
 #[derive(PartialEq, Clone)]
 pub struct Score
 {
-    pub team: String,
+    pub team: Box<str>,
     pub points: f64,
     pub plass: usize,
     pub climb: isize,

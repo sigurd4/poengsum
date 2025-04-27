@@ -16,7 +16,7 @@ impl From<InvalidFlag> for InvalidArg
 
 impl InvalidFlag
 {
-    pub fn at(self, no: usize, arg: Option<String>) -> Error
+    pub fn at(self, no: usize, arg: Option<Box<str>>) -> Error
     {
         InvalidArg::from(self).at(no, arg)
     }

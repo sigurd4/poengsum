@@ -44,27 +44,17 @@ impl Records
                 error: InvalidIO::Open
             })?;
         
-        let mut reader = BufReader::new(file);
-        let mut parser = RecordParser::new();
+        let reader = BufReader::new(file);
 
-        while let Some(line) = {
-            let mut line = String::new();
-            if reader.read_line(&mut line)
-                .map_err(|io_error| InvalidRead::InvalidIO {
+        let mut parser = RecordParser::new();
+        for line in reader.lines()
+        {
+            let line = line.map_err(|io_error| InvalidRead::InvalidIO {
                     io_error,
                     error: InvalidIO::Read {
                         row: parser.row()
                     }
-                })? != 0
-            {
-                Some(line)
-            }
-            else
-            {
-                None
-            }
-        }
-        {
+                })?.into_boxed_str();
             parser.parse_line(line)?
         }
 

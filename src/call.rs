@@ -24,7 +24,7 @@ impl FlagBuilder
                 Ok(Self::File)
             },
             _ => Err(InvalidArg::NonexistentFlag {
-                flag: flag.to_string()
+                flag: flag.into()
             })
         }
     }
@@ -70,7 +70,7 @@ impl RunBuilder
     {
         let mut args = args.into_iter();
         let _ = args.next();
-        
+
         let mut parser = Self::new();
         parser.parse(args)?;
         Ok(parser)
@@ -105,11 +105,10 @@ impl RunBuilder
     fn parse_round(arg: &str) -> Result<Round, InvalidArg>
     {
         let offs = |b: usize| b.checked_sub(1)
-            .map(|b| b)
             .ok_or(InvalidArg::RoundZero);
 
         let parse_int_notrim = |s: &str| s.parse::<usize>()
-            .map_err(|error| InvalidArg::from(error));
+            .map_err(InvalidArg::from);
 
         let parse_int = |s: &str| offs(parse_int_notrim(s.trim())?);
 
@@ -123,7 +122,7 @@ impl RunBuilder
         }
         else
         {
-            let round = parse_int(&arg)?;
+            let round = parse_int(arg)?;
             return Ok(Round::One(round))
         };
 
@@ -186,7 +185,7 @@ impl RunBuilder
                     match $e
                     {
                         Ok(b) => b,
-                        Err(e) => return Err(e.at(self.no, Some(arg)))
+                        Err(e) => return Err(e.at(self.no, Some(arg.into_boxed_str())))
                     }
                 };
             }
@@ -205,12 +204,12 @@ impl RunBuilder
             {
                 if let Some(flag) = arg.trim().strip_prefix("--")
                 {
-                    parser.flag_builder = Some(FlagBuilder::new(flag, &parser)?);
+                    parser.flag_builder = Some(FlagBuilder::new(flag, parser)?);
                     return Ok(())
                 }
                 else
                 {
-                    parser.rounds.add_round(RunBuilder::parse_round(&arg)?);
+                    parser.rounds.add_round(RunBuilder::parse_round(arg)?);
                 }
 
                 Ok(())

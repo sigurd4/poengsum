@@ -15,7 +15,7 @@ pub enum InvalidArg
     },
     RoundZero,
     NonexistentFlag {
-        flag: String
+        flag: Box<str>
     },
     InvalidFlag {
         error: InvalidFlag
@@ -34,7 +34,7 @@ impl From<ParseIntError> for InvalidArg
 
 impl InvalidArg
 {
-    pub fn at(self, no: usize, arg: Option<String>) -> Error
+    pub fn at(self, no: usize, arg: Option<Box<str>>) -> Error
     {
         Error::InvalidCall {
             no,

@@ -103,9 +103,13 @@ impl Display for Error
                             InvalidSyntax::NoTeams => write!(f,
                                 "The file \"{file}\" is empty!\nYou need to add some teams to your \"{file}\"-file.\n\n{rules}"
                             ),
-                            InvalidSyntax::CannotParsePoints { row, col, line, span, team, round, error } => write!(f,
-                                "Unable to parse points for team \"{team}\" for round {round} at line {row}, collumn {col} \"{span}\": {error}\n\n{row}| {line}\n\n\"{span}\" must be a valid number."
-                            ),
+                            InvalidSyntax::CannotParsePoints { row, round, col, line, team, error } => {
+                                let span = &line[col.clone()];
+                                let col = col.start;
+                                write!(f,
+                                    "Unable to parse points for team \"{team}\" for round {round} at line {row}, collumn {col} \"{span}\": {error}\n\n{row}| {line}\n\n\"{span}\" must be a valid number."
+                                )
+                            },
                         }
                     },
                 }
@@ -134,7 +138,7 @@ impl Display for Error
                             ),
                             InvalidArg::NonexistentFlag { flag } => {
                                 let options = Flag::OPTIONS.into_iter()
-                                    .map(|flag| format!("\n\t--{}", flag))
+                                    .map(|flag| format!("\n\t--{flag}"))
                                     .collect::<String>();
                                 write!(f,
                                     "The {nth} argument{arg} is invalid.\nThere is no available option with the name \"{flag}\".\nAvailable options are:{options}"

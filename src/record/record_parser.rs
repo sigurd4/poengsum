@@ -23,7 +23,7 @@ impl RecordParser
         self.row
     }
 
-    pub fn parse_line(&mut self, line: String) -> Result<(), InvalidSyntax>
+    pub fn parse_line(&mut self, line: Box<str>) -> Result<(), InvalidSyntax>
     {
         self.row += 1;
         if line.trim().is_empty()
@@ -38,7 +38,7 @@ impl RecordParser
                 col = Some(i);
             }
         }
-        let col = match col
+        let mut col = match col
         {
             Some(col) => col,
             None => return Err(InvalidSyntax::MissingColon {
@@ -55,20 +55,23 @@ impl RecordParser
                 line
             })
         }
-        let team = team.to_string();
-        let each_points = line.get(col + 1..).map(str::trim).unwrap_or("");
+        let team = Box::<str>::from(team);
+        col += 1;
+        let each_points = line.get(col..).map(str::trim).unwrap_or("");
 
         let mut points = Vec::new();
 
         for (i, span) in each_points.split_whitespace().enumerate()
         {
+            col = unsafe {
+                span.as_ptr().offset_from_unsigned(line.as_ptr())
+            };
             points.push(match span.parse::<f64>()
             {
                 Ok(points) => points,
                 Err(error) => return Err(InvalidSyntax::CannotParsePoints {
                     row: self.row,
-                    col: col + 1,
-                    span: span.to_string(),
+                    col: col..(col + span.len()),
                     line,
                     team,
                     round: i + 1,

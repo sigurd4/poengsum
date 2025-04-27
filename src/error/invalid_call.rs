@@ -4,7 +4,7 @@ use super::{ExpectedArg, InvalidArg};
 pub enum InvalidCall
 {
     InvalidArg {
-        arg: Option<String>,
+        arg: Option<Box<str>>,
         error: InvalidArg
     },
     ExpectedArg {
