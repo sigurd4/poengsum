@@ -2,7 +2,7 @@ use core::{cmp::Ordering, fmt::Display};
 
 use colored::Colorize;
 
-use crate::{error::Error, record::Record};
+use crate::{error::InsufficientData, record::Records, round::{BoundedRounds, Rounds}};
 
 #[derive(PartialEq, Clone)]
 pub struct Score
@@ -41,28 +41,31 @@ impl Display for Score
     }
 }
 
-impl Score
+pub struct Scores
 {
-    pub fn present(mut scores: Vec<Score>)
+    scores: Vec<Score>
+}
+
+impl Scores
+{
+    pub fn present(mut self)
     {
-        Self::sort(&mut scores, |score| score, |score| score);
+        self.sort();
     
-        for score in scores
+        for score in self.scores
         {
             println!("{score}");
         }
     }
 
-    fn sort<T>(scores: &mut [T], mut f: impl FnMut(&T) -> &Score, f_mut: impl FnMut(&mut T) -> &mut Score)
+    fn sort(&mut self)
     {
-        scores.sort_by(|a, b| f(a).partial_cmp(f(b)).unwrap_or(Ordering::Equal));
+        self.scores.sort_by(|a, b| b.partial_cmp(a).unwrap_or(Ordering::Equal));
 
         let mut j = 0;
         let mut prev = None;
 
-        for (i, score) in scores.iter_mut()
-            .map(f_mut)
-            .rev()
+        for (i, score) in self.scores.iter_mut()
             .enumerate()
         {
             if Some(score.points) != prev
@@ -74,107 +77,57 @@ impl Score
         }
     }
 
-    fn scores_reduce_no_climb(records: Vec<Record>, mut reduce: impl FnMut(Vec<f64>) -> f64) -> Vec<Score>
+    fn compared_to(&mut self, other: Scores)
     {
-        let mut scores = records.into_iter()
-            .enumerate()
-            .map(move |(uid, record)| Score {
-                team: record.team,
-                points: reduce(record.points),
-                climb: 0,
-                plass: 0,
-                uid
-            }).collect::<Vec<_>>();
-
-        Self::sort(&mut scores, |score| score, |score| score);
-        scores
-    }
-
-    fn scores_no_climb(records: Vec<Record>, runder: Option<Vec<usize>>) -> Vec<Score>
-    {
-        Self::scores_reduce_no_climb(
-            records,
-            |points| match &runder
-            {
-                Some(runder) => runder.iter()
-                    .flat_map(|&runde| points.get(runde))
-                    .copied()
-                    .sum(),
-                None => points.into_iter()
-                    .sum()
-            }
-        )
-    }
-
-    fn siste_runde(records: &[Record]) -> Option<usize>
-    {
-        records.iter()
-            .map(|record| record.points.len())
-            .max()
-            .and_then(|runde| runde.checked_sub(1))
-    }
-
-    fn check_runder(records: &[Record], runder: &Option<Vec<usize>>) -> Result<(), Error>
-    {
-        let siste_runde = Self::siste_runde(records).ok_or(Error::NoRoundsYet)?;
-
-        if let Some(runder) = runder
+        for other in other.scores.into_iter()
         {
-            for &runde in runder
+            for score in self.scores.iter_mut()
             {
-                if runde > siste_runde
+                if other.uid == score.uid
                 {
-                    return Err(Error::RoundNotYet {
-                        round: runde + 1,
-                        last_round: siste_runde + 1
-                    })
+                    score.climb = crate::checked_signed_diff(other.plass, score.plass).unwrap_or(0)
                 }
             }
         }
-
-        Ok(())
     }
 
-    fn runder_som_var(records: &[Record], runder: &Option<Vec<usize>>) -> Option<Vec<usize>>
+    pub fn new(records: Records, rounds: Rounds) -> Result<Scores, InsufficientData>
     {
-        match runder
+        fn scores_no_climb(records: Records, rounds: BoundedRounds) -> Scores
         {
-            None => Self::siste_runde(records)
-                .and_then(|siste_runde| siste_runde.checked_sub(1))
-                .map(|sist_runde| (0..=sist_runde).collect()),
-            Some(runder) => runder.len()
-                .checked_sub(2)
-                .map(|i| runder[..=i].to_vec())
+            let mut scores = Scores {
+                scores: records.into_iter()
+                    .enumerate()
+                    .map(move |(uid, record)| Score {
+                        team: record.team,
+                        points: rounds.iter()
+                            .flat_map(|&round| round.index(&record.points))
+                            .flatten()
+                            .copied()
+                            .sum(),
+                        climb: 0,
+                        plass: 0,
+                        uid
+                    }).collect::<Vec<_>>()
+            };
+            scores.sort();
+            scores
         }
-    }
 
-    pub fn scores(records: Vec<Record>, runder: Option<Vec<usize>>) -> Result<Vec<Score>, Error>
-    {
-        Self::check_runder(&records, &runder)?;
-
-        let prev_scores = Self::runder_som_var(&records, &runder)
-            .map(|runder_som_var| Self::scores_no_climb(
+        let rounds = rounds.bound(records.final_round())?;
+        
+        let prev_scores = rounds.clone()
+            .undo()
+            .map(|prev_rounds| scores_no_climb(
                 records.clone(),
-                Some(runder_som_var)
+                prev_rounds
             ));
 
-        let mut scores = Self::scores_no_climb(records, runder);
+        let mut scores = scores_no_climb(records, rounds);
 
         if let Some(prev_scores) = prev_scores
         {
-            for (i, score) in scores.iter_mut()
-                .enumerate()
-            {
-                for (j, prev_score) in prev_scores.iter()
-                    .enumerate()
-                {
-                    if prev_score.uid == score.uid
-                    {
-                        //score.climb = i.checked_signed_diff(j).unwrap_or(0)
-                        score.climb = crate::checked_signed_diff(i, j).unwrap_or(0)
-                    }
-                }
-            }
+            scores.compared_to(prev_scores)
         }
 
         Ok(scores)

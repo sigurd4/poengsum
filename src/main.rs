@@ -1,15 +1,39 @@
+use std::path::Path;
+
 use error::Error;
-use record::Record;
-use score::Score;
 
 moddef::moddef!(
     flat mod {
+        call,
+        run,
         error,
+        flag,
         record,
+        round,
         score
     }
 );
 
+// TODO: use .try_collect from std once stabilized
+fn try_collect<C, T, E>(iter: &mut impl Iterator<Item = Result<T, E>>) -> Result<C, E>
+where
+    C: FromIterator<T>
+{
+    let mut err = None;
+
+    let collection = core::iter::repeat_with(|| iter.next())
+        .map_while(|x| x.and_then(|x| x.map_err(|e| err = Some(e)).ok()))
+        .collect();
+
+    if let Some(err) = err
+    {
+        return Err(err);
+    }
+
+    Ok(collection)
+}
+
+// TODO: use .checked_signed_diff from std once stabilized
 fn checked_signed_diff(lhs: usize, rhs: usize) -> Option<isize>
 {
     let res = lhs.wrapping_sub(rhs) as isize;
@@ -18,46 +42,27 @@ fn checked_signed_diff(lhs: usize, rhs: usize) -> Option<isize>
     if !overflow { Some(res) } else { None }
 }
 
-const POENGSUM_PATH: &str = "./poengsum.txt";
+fn default_file_path() -> &'static Path
+{
+    Path::new("./poengsum.txt")
+}
 
 fn main()
 {
     if let Err(error) = run(std::env::args())
     {
-        eprintln!("Error: {error}")
+        eprintln!("{error}")
     }
 }
 
 fn run(args: impl Iterator<Item = String>) -> Result<(), Error>
 {
-    let records = Record::read()?;
-
-    let scores = Score::scores(records, parse_args(args)?)?;
-
-    Score::present(scores);
+    RunBuilder::from_args(args)?
+        .collect()?
+        .scores()?
+        .present();
 
     Ok(())
-}
-
-fn parse_args(mut args: impl Iterator<Item = String>) -> Result<Option<Vec<usize>>, Error>
-{
-    let _ = args.next();
-
-    let mut rounds = Vec::new();
-
-    for round in args.enumerate().map(|(i, arg)| {
-        let no = i + 1;
-        arg.parse::<usize>()
-            .map_err(|error| Error::CannotParseRound { no, arg, error })?
-            .checked_sub(1)
-            .ok_or(Error::RoundZero { no })
-    })
-    /* .try_collect::<Vec<_>>()? */
-    {
-        rounds.push(round?);
-    }
-
-    Ok(if !rounds.is_empty() { Some(rounds) } else { None })
 }
 
 #[cfg(test)]
