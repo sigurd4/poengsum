@@ -1,6 +1,6 @@
 use std::{borrow::Cow, path::{Path, PathBuf}};
 
-use crate::{error::{Error, ExpectedArg, InvalidArg, InvalidFlag}, flag::Flag, round::{Round, Rounds}, run::Run};
+use crate::{error::{ArgError, Error, ExpectedArg, InvalidArg, InvalidFlag}, flag::{Flag, FlagKind, FlagOption}, round::{Round, Rounds}, run::Run};
 
 enum FlagBuilder
 {
@@ -9,11 +9,11 @@ enum FlagBuilder
 
 impl FlagBuilder
 {
-    fn new(flag: &str, parser: &RunBuilder) -> Result<Self, InvalidArg>
+    fn new(flag: FlagOption<&str>, parser: &RunBuilder) -> Result<Result<Flag, Self>, InvalidArg>
     {
-        match flag
+        match FlagKind::try_from(flag)?
         {
-            "file" => if let Cow::Owned(_) = &parser.file //.is_owned()
+            FlagKind::File => if let Cow::Owned(_) = &parser.file //TODO: use .is_owned() when stabilized
             {
                 Err(InvalidArg::InvalidFlag {
                     error: InvalidFlag::FileAlreadySpecified
@@ -21,11 +21,8 @@ impl FlagBuilder
             }
             else
             {
-                Ok(Self::File)
-            },
-            _ => Err(InvalidArg::NonexistentFlag {
-                flag: flag.into()
-            })
+                Ok(Err(Self::File))
+            }
         }
     }
 
@@ -42,6 +39,18 @@ impl FlagBuilder
         match self
         {
             FlagBuilder::File => Err(ExpectedArg::Filename)
+        }
+    }
+
+    fn replace_and_collect(self, replace: &mut Option<FlagBuilder>) -> Result<Option<Flag>, ExpectedArg>
+    {
+        if let Some(builder) = replace.replace(self) && let Some(flag) = builder.collect()?
+        {
+            Ok(Some(flag))
+        }
+        else
+        {
+            Ok(None)
         }
     }
 }
@@ -100,6 +109,20 @@ impl RunBuilder
                 Err(InvalidFlag::FileAlreadySpecified)
             },
         }
+    }
+
+    fn add_flag_option(&mut self, flag: FlagOption<&str>) -> Result<(), ArgError>
+    {
+        if let Some(flag) = match FlagBuilder::new(flag, self)?
+        {
+            Ok(flag) => Some(flag),
+            Err(builder) => builder.replace_and_collect(&mut self.flag_builder)?,
+        }
+        {
+            self.add_flag(flag)?
+        }
+
+        Ok(())
     }
 
     fn parse_round(arg: &str) -> Result<Round, InvalidArg>
@@ -200,11 +223,19 @@ impl RunBuilder
                 continue
             }
 
-            fn parse_trimmed(parser: &mut RunBuilder, arg: &str) -> Result<(), InvalidArg>
+            fn parse_trimmed(parser: &mut RunBuilder, arg: &str) -> Result<(), ArgError>
             {
-                if let Some(flag) = arg.trim().strip_prefix("--")
+                if let Some(flags) = arg.trim().strip_prefix("-")
                 {
-                    parser.flag_builder = Some(FlagBuilder::new(flag, parser)?);
+                    match flags.strip_prefix("-")
+                    {
+                        Some(flag) => parser.add_flag_option(FlagOption::Long(flag))?,
+                        None => for flag in flags.chars()
+                        {
+                            parser.add_flag_option(FlagOption::Short(flag))?;
+                        }
+                    }
+
                     return Ok(())
                 }
                 else

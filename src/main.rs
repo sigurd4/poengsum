@@ -11,8 +11,12 @@ moddef::moddef!(
         record,
         round,
         score
+    },
+    mod {
+        help
     }
 );
+pub use help::Help;
 
 // TODO: use .try_collect from std once stabilized
 fn try_collect<C, T, E>(iter: &mut impl Iterator<Item = Result<T, E>>) -> Result<C, E>
@@ -80,6 +84,9 @@ mod tests
         crate::run(["poengsum", "2", "3"].into_iter().map(String::from))?;
 
         crate::run(["poengsum", "1", "2", "3"].into_iter().map(String::from))?;
+
+        crate::run(["poengsum", "--file", "poengsum.txt"].into_iter().map(String::from))?;
+        crate::run(["poengsum", "-f", "poengsum.txt"].into_iter().map(String::from))?;
 
         Ok(())
     }

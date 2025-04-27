@@ -1,10 +1,11 @@
 use core::fmt::Display;
 use std::{borrow::Cow, io::ErrorKind, path::Path};
 
-use crate::flag::Flag;
+use crate::Help;
 
 moddef::moddef!(
     flat(pub) mod {
+        arg_error,
         expected_arg,
         insufficient_data,
         invalid_arg,
@@ -58,16 +59,21 @@ impl Display for Error
         };
         match self
         {
-            Self::InvalidRead { file, error } => {
-                let file = file.display();
+            Self::InvalidRead { file: file_path, error } => {
+                let file = file_path.display();
                 match error
                 {
                     InvalidRead::InvalidIO { io_error, error } => {
                         let hint = |placeholder: &str| match io_error.kind()
                         {
-                            ErrorKind::NotFound => {
+                            ErrorKind::NotFound => if file_path == crate::default_file_path()
+                            {
                                 let rules = Self::rules(&file);
-                                format!("\nIf it doesn't exist, create it!\n\n{rules}")
+                                format!("\nIf it doesn't exist, create it!\n\nRules:\n{rules}")
+                            }
+                            else
+                            {
+                                "".to_string()
                             },
                             ErrorKind::PermissionDenied => "\nYou don't have permission to view this file.".to_string(),
                             ErrorKind::IsADirectory => format!("\nThere's, for some reason, a directory with the same name as {file}.\nThis program needs {file} to be a file, not a directory."),
@@ -77,13 +83,13 @@ impl Display for Error
                         match error
                         {
                             InvalidIO::Open => {
-                                let hint = hint("Oops!");
+                                let hint = hint("");
                                 write!(f,
                                     "Failed to open file \"{file}\".\n{io_error}.{hint}"
                                 )
                             },
                             InvalidIO::Read { row } => {
-                                let hint = hint("Maybe the file is busy?");
+                                let hint = hint("\nMaybe the file is busy?");
                                 write!(f,
                                     "Failed to read line {row} of file \"{file}\".\n{io_error}.{hint}"
                                 )
@@ -137,12 +143,11 @@ impl Display for Error
                                 "The {nth} argument{arg} is invalid.\n0 is not a valid round! Rounds start at 1, not 0."
                             ),
                             InvalidArg::NonexistentFlag { flag } => {
-                                let options = Flag::OPTIONS.into_iter()
-                                    .map(|flag| format!("\n\t--{flag}"))
-                                    .collect::<String>();
-                                write!(f,
-                                    "The {nth} argument{arg} is invalid.\nThere is no available option with the name \"{flag}\".\nAvailable options are:{options}"
-                                )
+                                writeln!(f,
+                                    "The {nth} argument{arg} is invalid.\nThere is no available option with the name \"{flag}\"."
+                                )?;
+                                let examples = Help::flags_examples();
+                                write!(f, "{examples}")
                             },
                             InvalidArg::InvalidFlag { error } => match error
                             {
@@ -152,7 +157,7 @@ impl Display for Error
                                         "The {nth} argument{arg} is invalid.\nYou've already specified a filename.\nBy default, the file that the score is read from is \"{default_file}\", but you can use a different file by setting the \"--file\" flag, followed by a path.\nYou're not allowed to set multiple files."
                                     )
                                 }
-                            }
+                            },
                         }
                     },
                     InvalidCall::ExpectedArg { error } => match error

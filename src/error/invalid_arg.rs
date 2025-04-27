@@ -1,5 +1,7 @@
 use core::{ num::ParseIntError, str::FromStr};
 
+use crate::flag::FlagOption;
+
 use super::{Error, InvalidCall, InvalidFlag};
 
 #[derive(Debug)]
@@ -15,7 +17,7 @@ pub enum InvalidArg
     },
     RoundZero,
     NonexistentFlag {
-        flag: Box<str>
+        flag: FlagOption<Box<str>>
     },
     InvalidFlag {
         error: InvalidFlag
