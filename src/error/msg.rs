@@ -53,14 +53,17 @@ impl Display for OffendingLine<'_>
 
         if let Some(line) = *line
         {
+            let mut line = line.to_string();
+            line.push(' ');
             let row = format!("{row} | ");
             let (col, [line_before, line, line_after]) = match col
             {
                 None => {
-                    (0, ["", line, ""])
+                    (0, ["", &line, ""])
                 },
                 Some(Range { start, end }) => {
-                    let (start, end) = (*start, *end);
+                    let end = (*end).min(line.len());
+                    let start = (*start).min(end);
                     let (line_before, line) = line.split_at(start);
                     let (line, line_after) = line.split_at(end);
 
