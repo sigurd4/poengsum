@@ -1,6 +1,6 @@
 use crate::{flag::FlagKind, help::{Docs, FlagUsage}};
 
-use super::{Error, ErrorMsg, InvalidArg, InvalidArgMsg};
+use super::{Error, Msg, InvalidArg, InvalidArgMsg};
 
 #[derive(Debug, Clone, Copy)]
 pub enum InvalidFlag
@@ -33,11 +33,11 @@ impl InvalidFlag
         }
     }
 
-    pub fn msg<'a>(&'a self, exe: &'static str, no: usize, arg: &str) -> ErrorMsg<'a>
+    pub fn msg<'a>(&'a self, exe: &'static str, no: usize, arg: &str) -> Msg<'a>
     {
         match self
         {
-            InvalidFlag::FileAlreadySpecified => ErrorMsg {
+            InvalidFlag::FileAlreadySpecified => Msg {
                 msg: InvalidArgMsg::Invalid.msg(no, arg),
                 error: None,
                 line: None,
@@ -47,7 +47,7 @@ impl InvalidFlag
                     flag: FlagKind::File
                 }))
             },
-            InvalidFlag::HelpAfterInteger => ErrorMsg {
+            InvalidFlag::HelpAfterInteger => Msg {
                 msg: InvalidArgMsg::Invalid.msg(no, arg),
                 error: None,
                 line: None,

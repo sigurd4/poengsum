@@ -1,4 +1,4 @@
-use super::{ErrorMsg, ExpectedArg, InvalidArg};
+use super::{Msg, ExpectedArg, InvalidArg};
 
 #[derive(Debug)]
 pub enum InvalidCall
@@ -14,7 +14,7 @@ pub enum InvalidCall
 
 impl InvalidCall
 {
-    pub fn msg(&self, exe: &'static str, no: usize) -> ErrorMsg
+    pub fn msg(&self, exe: &'static str, no: usize) -> Msg
     {
         match self
         {

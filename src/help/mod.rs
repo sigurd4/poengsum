@@ -1,6 +1,6 @@
 use core::fmt::Display;
 
-use crate::{error::{ArgError, ErrorMsg, ExpectedArg, InvalidArg, InvalidFlag}, flag::FlagKind};
+use crate::{error::{ArgError, Msg, ExpectedArg, InvalidArg, InvalidFlag}, flag::FlagKind};
 
 moddef::moddef!(
     flat(pub) mod {
@@ -178,7 +178,7 @@ impl Display for Help
 
 impl Help
 {
-    pub fn msg(&self) -> ErrorMsg
+    pub fn msg(&self) -> Msg
     {
         let mut msg = "Showing help".to_string();
         let mut flags = self.flags.iter();
@@ -203,7 +203,7 @@ impl Help
             msg = msgs.concat()
         }
 
-        ErrorMsg {
+        Msg {
             msg: (msg + ".").into_boxed_str(),
             error: None,
             line: None,

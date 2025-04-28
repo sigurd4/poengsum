@@ -1,6 +1,6 @@
 use crate::{flag::FlagKind, help::{Docs, FlagUsage}};
 
-use super::{Error, ErrorMsg, InvalidCall};
+use super::{Error, Msg, InvalidCall};
 
 #[derive(Debug)]
 pub enum ExpectedArg
@@ -32,11 +32,11 @@ impl ExpectedArg
         }
     }
 
-    pub fn msg(&self, exe: &'static str, no: usize) -> ErrorMsg
+    pub fn msg(&self, exe: &'static str, no: usize) -> Msg
     {
         match self
         {
-            ExpectedArg::Filename => ErrorMsg {
+            ExpectedArg::Filename => Msg {
                 msg: ExpectedArgMsg.msg(no, "a filename"),
                 error: None,
                 line: None,

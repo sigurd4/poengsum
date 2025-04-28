@@ -2,7 +2,7 @@ use core::{ num::ParseIntError, str::FromStr};
 
 use crate::{flag::{FlagKind, FlagOption}, help::{ArgUsage, Docs, FlagUsage, FlagsUsages}};
 
-use super::{Error, ErrorMsg, InvalidCall, InvalidFlag};
+use super::{Error, Msg, InvalidCall, InvalidFlag};
 
 #[derive(Debug)]
 pub enum InvalidArg
@@ -68,11 +68,11 @@ impl InvalidArg
         }
     }
 
-    pub fn msg<'a>(&'a self, exe: &'static str, no: usize, arg: &str) -> ErrorMsg<'a>
+    pub fn msg<'a>(&'a self, exe: &'static str, no: usize, arg: &str) -> Msg<'a>
     {
         match self
         {
-            InvalidArg::UseTwoDots => ErrorMsg {
+            InvalidArg::UseTwoDots => Msg {
                 msg: InvalidArgMsg::Invalid.msg(no, arg),
                 error: None,
                 line: None,
@@ -81,7 +81,7 @@ impl InvalidArg
                     exe
                 }))
             },
-            InvalidArg::CannotParseInteger { error } => ErrorMsg {
+            InvalidArg::CannotParseInteger { error } => Msg {
                 msg: InvalidArgMsg::Parse.msg(no, arg),
                 error: Some(error),
                 line: None,
@@ -90,7 +90,7 @@ impl InvalidArg
                     exe
                 }))
             },
-            InvalidArg::NotInOrder { start, end } => ErrorMsg {
+            InvalidArg::NotInOrder { start, end } => Msg {
                 msg: InvalidArgMsg::Invalid.msg(no, arg),
                 error: None,
                 line: None,
@@ -99,7 +99,7 @@ impl InvalidArg
                     exe
                 }))
             },
-            InvalidArg::RoundZero => ErrorMsg {
+            InvalidArg::RoundZero => Msg {
                 msg: InvalidArgMsg::Invalid.msg(no, arg),
                 error: None,
                 line: None,
@@ -108,7 +108,7 @@ impl InvalidArg
                     exe
                 }))
             },
-            InvalidArg::NonexistentFlag { flag } => ErrorMsg {
+            InvalidArg::NonexistentFlag { flag } => Msg {
                 msg: InvalidArgMsg::Invalid.msg(no, arg),
                 error: None,
                 line: None,
@@ -118,7 +118,7 @@ impl InvalidArg
                 }))
             },
             InvalidArg::InvalidFlag { error } => error.msg(exe, no, arg),
-            InvalidArg::IntegerAfterHelp => ErrorMsg {
+            InvalidArg::IntegerAfterHelp => Msg {
                 msg: InvalidArgMsg::Invalid.msg(no, arg),
                 error: None,
                 line: None,

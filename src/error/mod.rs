@@ -6,7 +6,6 @@ use crate::help::Help;
 moddef::moddef!(
     flat(pub) mod {
         arg_error,
-        error_msg,
         expected_arg,
         insufficient_data,
         invalid_arg,
@@ -14,7 +13,8 @@ moddef::moddef!(
         invalid_flag,
         invalid_io,
         invalid_read,
-        invalid_syntax
+        invalid_syntax,
+        msg,
     }
 );
 
@@ -53,14 +53,14 @@ impl Error
         format!("{no}{suffix}").into_boxed_str()
     }
 
-    fn msg(&self) -> ErrorMsg
+    fn msg(&self) -> Msg
     {
         match self
         {
             Error::InvalidRead { file, error } => error.msg(&*file),
             Error::InvalidCall { exe, no, error } => error.msg(exe, *no),
             Error::InsufficientData { error } => error.msg(),
-            Error::NoExecutable => ErrorMsg {
+            Error::NoExecutable => Msg {
                 msg: "You somehow managed to run this binary without even a 0th argument.".into(),
                 error: None,
                 line: None,

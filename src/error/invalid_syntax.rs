@@ -3,7 +3,7 @@ use std::path::Path;
 
 use crate::help::{Docs, Rules};
 
-use super::{ErrorMsg, InvalidRead, Severity, OffendingLine};
+use super::{Msg, InvalidRead, Severity, OffendingLine};
 
 #[derive(Debug)]
 pub enum InvalidSyntax
@@ -30,12 +30,12 @@ pub enum InvalidSyntax
 
 impl InvalidSyntax
 {
-    pub fn msg<'a>(&'a self, file: &'a Path) -> ErrorMsg<'a>
+    pub fn msg<'a>(&'a self, file: &'a Path) -> Msg<'a>
     {
         let file_display = file.display();
         match self
         {
-            InvalidSyntax::NoTeams => ErrorMsg {
+            InvalidSyntax::NoTeams => Msg {
                 msg: format!("The file \"{file_display}\" is empty!").into_boxed_str(),
                 error: None,
                 line: Some(OffendingLine {
@@ -50,7 +50,7 @@ impl InvalidSyntax
                     file
                 }))
             },
-            InvalidSyntax::MissingColon { row, line } => ErrorMsg {
+            InvalidSyntax::MissingColon { row, line } => Msg {
                 msg: format!("Seperator ':' missing at line {row}.").into_boxed_str(),
                 error: None,
                 line: Some(OffendingLine {
@@ -65,7 +65,7 @@ impl InvalidSyntax
                     file
                 }))
             },
-            InvalidSyntax::UnnamedTeam { row, col, line } => ErrorMsg {
+            InvalidSyntax::UnnamedTeam { row, col, line } => Msg {
                 msg: format!("Team name at line {row} is empty.").into_boxed_str(),
                 error: None,
                 line: Some(OffendingLine {
@@ -83,7 +83,7 @@ impl InvalidSyntax
             InvalidSyntax::CannotParsePoints { row, col, round, line, team, error } => {
                 let span = &line[col.clone()];
                 let col_start = col.start;
-                ErrorMsg {
+                Msg {
                     msg: format!("Unable to parse points for team \"{team}\" for round {round} at line {row}, collumn {col_start} \"{span}\": {error}\n\n{row}| {line}\n\n").into_boxed_str(),
                     error: Some(error),
                     line: Some(OffendingLine {

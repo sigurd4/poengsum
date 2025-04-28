@@ -2,7 +2,7 @@ use std::{io::ErrorKind, path::Path};
 
 use crate::help::{Docs, Rules};
 
-use super::{ErrorMsg, Severity, OffendingLine};
+use super::{Msg, Severity, OffendingLine};
 
 #[derive(Debug)]
 pub enum InvalidIO
@@ -15,7 +15,7 @@ pub enum InvalidIO
 
 impl InvalidIO
 {
-    pub fn msg<'a>(&'a self, file: &'a Path, io_error: &'a std::io::Error) -> ErrorMsg<'a>
+    pub fn msg<'a>(&'a self, file: &'a Path, io_error: &'a std::io::Error) -> Msg<'a>
     {
         let file_display = file.display();
 
@@ -60,7 +60,7 @@ impl InvalidIO
         {
             InvalidIO::Open => {
                 let (hint, docs) = hint(None);
-                ErrorMsg {
+                Msg {
                     msg: format!("Failed to open file \"{file_display}\".").into_boxed_str(),
                     error: Some(io_error),
                     line: None,
@@ -70,7 +70,7 @@ impl InvalidIO
             },
             InvalidIO::Read { row } => {
                 let (hint, docs) = hint(None);
-                ErrorMsg {
+                Msg {
                     msg: format!("Failed to open file \"{file_display}\".").into_boxed_str(),
                     error: Some(io_error),
                     line: Some(OffendingLine {

@@ -1,4 +1,4 @@
-use super::{Error, ErrorMsg};
+use super::{Error, Msg};
 
 #[derive(Debug)]
 pub enum InsufficientData
@@ -13,25 +13,25 @@ pub enum InsufficientData
 
 impl InsufficientData
 {
-    pub fn msg(&self) -> ErrorMsg
+    pub fn msg(&self) -> Msg
     {
         match self
         {
-            InsufficientData::NoRoundsQueried => ErrorMsg {
+            InsufficientData::NoRoundsQueried => Msg {
                 msg: "No results.".into(),
                 error: None,
                 line: None,
                 hint: Some("The range of rounds provided is empty.".into()),
                 docs: None
             },
-            InsufficientData::NoRoundsYet => ErrorMsg {
+            InsufficientData::NoRoundsYet => Msg {
                 msg: "No results.".into(),
                 error: None,
                 line: None,
                 hint: Some("None of the teams have gotten any points yet!".into()),
                 docs: None
             },
-            InsufficientData::RoundNotYet { round, final_round } => ErrorMsg {
+            InsufficientData::RoundNotYet { round, final_round } => Msg {
                 msg: format!("Round {round} hasn't happened yet.").into_boxed_str(),
                 error: None,
                 line: None,

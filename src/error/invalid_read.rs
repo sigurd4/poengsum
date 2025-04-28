@@ -1,6 +1,6 @@
 use std::{borrow::Cow, path::Path};
 
-use super::{Error, ErrorMsg, InvalidIO, InvalidSyntax};
+use super::{Error, Msg, InvalidIO, InvalidSyntax};
 
 #[derive(Debug)]
 pub enum InvalidRead
@@ -24,7 +24,7 @@ impl InvalidRead
         }
     }
 
-    pub fn msg<'a>(&'a self, file: &'a Path) -> ErrorMsg<'a>
+    pub fn msg<'a>(&'a self, file: &'a Path) -> Msg<'a>
     {
         match self
         {

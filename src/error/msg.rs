@@ -73,7 +73,7 @@ impl Display for OffendingLine<'_>
 
             let lines = [
                 line_before.bright_black(),
-                line.bright_black().on_color(severity_color).underline(),
+                line.color(severity_color).underline(),
                 line_after.bright_black()
             ];
 
@@ -87,7 +87,7 @@ impl Display for OffendingLine<'_>
     }
 }
 
-pub struct ErrorMsg<'a>
+pub struct Msg<'a>
 {
     pub msg: Box<str>,
     pub error: Option<&'a dyn Error>,
@@ -96,7 +96,7 @@ pub struct ErrorMsg<'a>
     pub docs: Option<Docs<'a>>
 }
 
-impl Display for ErrorMsg<'_>
+impl Display for Msg<'_>
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
     {
@@ -110,12 +110,10 @@ impl Display for ErrorMsg<'_>
             let error = format!("{error}").red();
             write!(f, "\n\n{error}")?;
         }
-
         if let Some(line) = line
         {
             write!(f, "\n\n{line}")?;
         }
-
         if let Some(docs) = docs
         {
             write!(f, "\n\n{docs}")?;
