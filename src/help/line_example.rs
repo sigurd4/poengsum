@@ -18,7 +18,7 @@ impl Display for LineExample
         let Self {team, points, effect} = self;
         let mut align = ALIGN;
 
-        let team = format!("{team}:").blue();
+        let team = format!("{team}:").red();
         let points = points.white();
 
         align = align.saturating_sub(team.len() + points.len() + 2);

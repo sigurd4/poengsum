@@ -47,29 +47,27 @@ impl Display for OffendingLine<'_>
             {
                 ""
             };
-            format!("In {file} (line: {row}{at_col}){colon}").italic().color(severity_color)
+            format!("In {file} (line: {row}{at_col}){colon}").bold()
         };
         write!(f, "{in_file}")?;
 
         if let Some(line) = *line
         {
-            let [line_before, line, line_after] = match col
+            let row = format!("{row} | ");
+            let (col, [line_before, line, line_after]) = match col
             {
                 None => {
-                    let arrow = "v".color(severity_color);
-                    writeln!(f, "\n{arrow}")?;
-                    ["", line, ""]
+                    (0, ["", line, ""])
                 },
                 Some(Range { start, end }) => {
                     let (start, end) = (*start, *end);
-                    let arrow = format!("{:#>start$}", "v").color(severity_color);
-                    writeln!(f, "\n{arrow}")?;
                     let (line_before, line) = line.split_at(start);
                     let (line, line_after) = line.split_at(end);
 
-                    [line_before, line, line_after]
+                    (start, [line_before, line, line_after])
                 }
             };
+            write!(f, "\n{arrow}\n{row}", arrow = format!("{v:>offset$}", offset = col + row.len() + 1, v = "v").color(severity_color))?;
 
             let lines = [
                 line_before.bright_black(),
@@ -107,7 +105,7 @@ impl Display for Msg<'_>
 
         if let Some(error) = error
         {
-            let error = format!("{error}").red();
+            let error = format!("Error: {error}.").red();
             write!(f, "\n\n{error}")?;
         }
         if let Some(line) = line

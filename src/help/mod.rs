@@ -165,7 +165,7 @@ impl Display for Help
 
             return Ok(())
         }
-
+        
         let arg_usage = ArgUsage {
             exe: &*self.exe
         };

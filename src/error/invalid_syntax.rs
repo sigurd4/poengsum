@@ -46,9 +46,7 @@ impl InvalidSyntax
                     col: None
                 }),
                 hint: Some(format!("You need to add some teams to your \"{file_display}\"-file.").into_boxed_str()),
-                docs: Some(Docs::Rules(Rules {
-                    file
-                }))
+                docs: Some(Docs::Rules(Rules))
             },
             InvalidSyntax::MissingColon { row, line } => Msg {
                 msg: format!("Seperator ':' missing at line {row}.").into_boxed_str(),
@@ -61,9 +59,7 @@ impl InvalidSyntax
                     col: None
                 }),
                 hint: Some("Use a ':' to separate the team name and their points for each round.".into()),
-                docs: Some(Docs::Rules(Rules {
-                    file
-                }))
+                docs: Some(Docs::Rules(Rules))
             },
             InvalidSyntax::UnnamedTeam { row, col, line } => Msg {
                 msg: format!("Team name at line {row} is empty.").into_boxed_str(),
@@ -76,9 +72,7 @@ impl InvalidSyntax
                     col: Some(col.clone())
                 }),
                 hint: Some("Give that team a name!".into()),
-                docs: Some(Docs::Rules(Rules {
-                    file
-                }))
+                docs: Some(Docs::Rules(Rules))
             },
             InvalidSyntax::CannotParsePoints { row, col, round, line, team, error } => {
                 let span = &line[col.clone()];
@@ -94,9 +88,7 @@ impl InvalidSyntax
                         col: Some(col.clone())
                     }),
                     hint: Some(format!("\"{span}\" must be a valid number.").into_boxed_str()),
-                    docs: Some(Docs::Rules(Rules {
-                        file
-                    }))
+                    docs: Some(Docs::Rules(Rules))
                 }
             },
         }

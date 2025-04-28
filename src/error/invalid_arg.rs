@@ -85,7 +85,7 @@ impl InvalidArg
                 msg: InvalidArgMsg::Parse.msg(no, arg),
                 error: Some(error),
                 line: None,
-                hint: Some("Round must be a valid number (a nonzero integer).".into()),
+                hint: Some("Round must be a valid number (a nonzero positive integer).".into()),
                 docs: Some(Docs::ArgUsage(ArgUsage {
                     exe
                 }))

@@ -23,12 +23,9 @@ impl InvalidIO
         {
             ErrorKind::NotFound => if file == crate::default_file_path()
             {
-                let rules = Rules {
-                    file: &*file
-                };
                 (
                     Some(format!("If it doesn't exist, create it!").into_boxed_str()),
-                    Some(Docs::Rules(rules))
+                    Some(Docs::Rules(Rules))
                 )
             }
             else

@@ -9,7 +9,7 @@ pub enum Docs<'a>
     //FlagHelp(FlagHelp),
     FlagsUsages(FlagsUsages),
     FlagUsage(FlagUsage),
-    Rules(Rules<'a>)
+    Rules(Rules)
 }
 
 impl Display for Docs<'_>
