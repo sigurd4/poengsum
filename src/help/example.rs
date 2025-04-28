@@ -2,14 +2,14 @@ use core::fmt::Display;
 
 use colored::Colorize;
 
-pub struct Example<'a>
+pub struct Example
 {
-    pub exe: &'a str,
-    pub args: Vec<&'a str>,
-    pub effect: Option<&'a str>
+    pub exe: &'static str,
+    pub args: Vec<Box<str>>,
+    pub effect: Option<Box<str>>
 }
 
-impl<'a> Display for Example<'a>
+impl Display for Example
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
     {
@@ -22,7 +22,7 @@ impl<'a> Display for Example<'a>
             write!(f, " {arg}")?;
         }
 
-        if let Some(effect) = self.effect
+        if let Some(effect) = self.effect.as_ref()
         {
             let effect = effect.italic().bright_black();
             write!(f, " \t\t{effect}")?;

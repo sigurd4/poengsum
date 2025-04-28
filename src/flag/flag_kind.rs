@@ -26,27 +26,33 @@ impl FlagKind
     {
         self.option().chars().next().unwrap()
     }
-    pub fn examples<'a>(self, exe: &'a str) -> Vec<Example<'a>>
+    pub fn examples(self, exe: &'static str) -> Vec<Example>
     {
         match self
         {
-            Self::Help => vec![
-                Example {
-                    exe,
-                    args: vec!["--help"],
-                    effect: Some("Shows usage of this program.")
-                },
-                Example {
-                    exe,
-                    args: vec!["--help", "--file"],
-                    effect: Some("Shows usage of the option \"--file\".")
+            Self::Help => core::iter::once(Example {
+                exe,
+                args: vec!["--help".into()],
+                effect: Some("Shows usage of this program.".into())
+            }).chain(Flag::VARIANTS.into_iter()
+                .filter_map(|flag| if flag != FlagKind::Help
+                {
+                    Some(Example {
+                        exe,
+                        args: vec!["--help".into(), format!("--{flag}").into_boxed_str()],
+                        effect: Some(format!("Shows usage of the option \"--{flag}\".").into_boxed_str())
+                    })
                 }
-            ],
+                else
+                {
+                    None
+                })
+            ).collect(),
             Self::File => vec![
                 Example {
                     exe,
-                    args: vec!["--file", "<path>"],
-                    effect: Some("Loads a different poengsum-file.")
+                    args: vec!["--file".into(), "<path>".into()],
+                    effect: Some("Loads a different poengsum-file.".into())
                 }
             ]
         }

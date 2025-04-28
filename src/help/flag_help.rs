@@ -4,14 +4,14 @@ use crate::flag::FlagKind;
 
 use super::FlagUsage;
 
-pub struct FlagHelp<'a>
+pub struct FlagHelp
 {
-    pub exe: &'a str,
+    pub exe: &'static str,
     pub flag: FlagKind,
-    pub extra: Option<&'a str>
+    pub extra: Option<&'static str>
 }
 
-impl<'a> Display for FlagHelp<'a>
+impl Display for FlagHelp
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
     {
@@ -36,7 +36,7 @@ impl<'a> Display for FlagHelp<'a>
             flag: self.flag
         };
 
-        write!(f, "\nUsage:\t{example}")?;
+        write!(f, "\nUsage of {example}")?;
 
         Ok(())
     }

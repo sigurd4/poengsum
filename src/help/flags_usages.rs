@@ -2,12 +2,12 @@ use core::fmt::Display;
 
 use crate::{flag::Flag, help::FlagUsage};
 
-pub struct FlagsUsages<'a>
+pub struct FlagsUsages
 {
-    pub exe: &'a str
+    pub exe: &'static str
 }
 
-impl<'a> Display for FlagsUsages<'a>
+impl Display for FlagsUsages
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
     {
