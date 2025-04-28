@@ -1,5 +1,7 @@
 use core::fmt::Display;
 
+use colored::Colorize;
+
 use crate::{flag::Flag, help::FlagUsage};
 
 pub struct FlagsUsages
@@ -15,15 +17,28 @@ impl Display for FlagsUsages
         {
             return Ok(())
         }
-        write!(f, "Available options are:")?;
+        write!(f, "{header}", header = "Available options are:".bold())?;
     
         for flag in Flag::VARIANTS
         {
+            write!(f, "\n")?;
+
             let flag_example = FlagUsage {
                 exe: self.exe,
                 flag
             };
-            write!(f, "\n\t{flag_example}")?;
+
+            let opt = flag_example.flag.option();
+            let opt_short = flag_example.flag.option_short();
+            let examples = flag_example.flag.examples(self.exe);
+            
+            let of = format!("--{opt} or -{opt_short}:").italic().bright_black();
+            write!(f, "{of}")?;
+    
+            for example in examples
+            {
+                write!(f, "\n\t{example}")?;
+            }
         }
     
         Ok(())

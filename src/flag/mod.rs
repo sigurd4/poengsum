@@ -20,12 +20,12 @@ impl Flag
     pub const VARIANT_COUNT: usize = 2; //core::mem::variant_count::<FlagKind>(); TODO use this instead when stable
     pub const VARIANTS: [FlagKind; Self::VARIANT_COUNT] = [FlagKind::Help, FlagKind::File];
 
-    /*pub fn kind(&self) -> FlagKind
+    pub fn kind(&self) -> FlagKind
     {
         match self
         {
             Self::Help(..) => FlagKind::Help,
             Self::File(..) => FlagKind::File
         }
-    }*/
+    }
 }

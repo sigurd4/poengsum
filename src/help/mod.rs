@@ -1,15 +1,21 @@
 use core::fmt::Display;
 
-use crate::{error::{ArgError, ExpectedArg, InvalidArg, InvalidFlag}, flag::FlagKind};
+use crate::{error::{ArgError, ErrorMsg, ExpectedArg, InvalidArg, InvalidFlag}, flag::FlagKind};
 
 moddef::moddef!(
     flat(pub) mod {
-        example,
+        arg_usage,
+        call_example,
+        line_example,
         flag_help,
         flag_usage,
         flags_usages,
+        rules,
+        docs
     }
 );
+
+const ALIGN: usize = 8*4;
 
 #[derive(Clone, Debug)]
 pub struct Help
@@ -122,44 +128,36 @@ impl Help
             self.flags.push(flag);
         }
     }
+
+    pub fn prepend_flags(&mut self, mut flags: Vec<FlagKind>)
+    {
+        std::mem::swap(&mut self.flags, &mut flags);
+        for flag in flags
+        {
+            self.add_flag(flag);
+        }
+    }
 }
 
 impl Display for Help
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
     {
-        if {
-            let mut flags = self.flags.iter();
-            if let Some(mut flag) = flags.next()
-            {
-                write!(f, "Showing help for \"--{flag}\"")?;
-
-                if let Some(next) = flags.next()
-                {
-                    flag = next;
-                    for next in flags
-                    {
-                        write!(f, ", \"--{flag}\"")?;
-                        flag = next;
-                    }
-
-                    write!(f, " and \"--{flag}\"\n")?;
-                }
-
-                true
-            }
-            else
-            {
-                false
-            }
-        }
+        let mut flags = self.flags.iter();
+        if let Some(&flag) = flags.next()
         {
-            for &flag in self.flags.iter()
+            let help = FlagHelp {
+                exe: &*self.exe,
+                flag
+            };
+
+            write!(f, "{help}")?;
+
+            for &flag in flags
             {
                 let help = FlagHelp {
                     exe: &*self.exe,
-                    flag,
-                    extra: None
+                    flag
                 };
 
                 write!(f, "\n{help}")?;
@@ -168,10 +166,49 @@ impl Display for Help
             return Ok(())
         }
 
-        let usage = FlagsUsages {
+        let arg_usage = ArgUsage {
             exe: &*self.exe
         };
+        let flags_usage = FlagsUsages {
+            exe: &*self.exe
+        };
+        write!(f, "{arg_usage}\n\n{flags_usage}")
+    }
+}
 
-        write!(f, "{usage}")
+impl Help
+{
+    pub fn msg(&self) -> ErrorMsg
+    {
+        let mut msg = "Showing help".to_string();
+        let mut flags = self.flags.iter();
+
+        if let Some(mut flag) = flags.next()
+        {
+            let mut msgs = vec![msg];
+            msgs.push(format!(" for \"--{flag}\""));
+
+            if let Some(next) = flags.next()
+            {
+                flag = next;
+                for next in flags
+                {
+                    msgs.push(format!(", \"--{flag}\""));
+                    flag = next;
+                }
+
+                msgs.push(format!(" and \"--{flag}\"\n"));
+            }
+
+            msg = msgs.concat()
+        }
+
+        ErrorMsg {
+            msg: (msg + ".").into_boxed_str(),
+            error: None,
+            line: None,
+            hint: None,
+            docs: Some(Docs::Help(self))
+        }
     }
 }

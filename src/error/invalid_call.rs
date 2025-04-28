@@ -1,4 +1,4 @@
-use super::{ExpectedArg, InvalidArg};
+use super::{ErrorMsg, ExpectedArg, InvalidArg};
 
 #[derive(Debug)]
 pub enum InvalidCall
@@ -9,5 +9,22 @@ pub enum InvalidCall
     },
     ExpectedArg {
         error: ExpectedArg
+    }
+}
+
+impl InvalidCall
+{
+    pub fn msg(&self, exe: &'static str, no: usize) -> ErrorMsg
+    {
+        match self
+        {
+            InvalidCall::InvalidArg { arg, error } => {
+                let arg = arg.as_ref()
+                    .map(|arg| format!(" \"{arg}\""))
+                    .unwrap_or_else(String::new);
+                error.msg(exe, no, &*arg)
+            }
+            InvalidCall::ExpectedArg { error } => error.msg(exe, no),
+        }
     }
 }

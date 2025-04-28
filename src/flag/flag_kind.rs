@@ -1,6 +1,6 @@
 use core::{fmt::Display, ops::Deref};
 
-use crate::{error::InvalidArg, help::Example};
+use crate::{error::InvalidArg, help::CallExample};
 
 use super::{Flag, FlagOption};
 
@@ -26,18 +26,18 @@ impl FlagKind
     {
         self.option().chars().next().unwrap()
     }
-    pub fn examples(self, exe: &'static str) -> Vec<Example>
+    pub fn examples(self, exe: &'static str) -> Vec<CallExample>
     {
         match self
         {
-            Self::Help => core::iter::once(Example {
+            Self::Help => core::iter::once(CallExample {
                 exe,
                 args: vec!["--help".into()],
                 effect: Some("Shows usage of this program.".into())
             }).chain(Flag::VARIANTS.into_iter()
                 .filter_map(|flag| if flag != FlagKind::Help
                 {
-                    Some(Example {
+                    Some(CallExample {
                         exe,
                         args: vec!["--help".into(), format!("--{flag}").into_boxed_str()],
                         effect: Some(format!("Shows usage of the option \"--{flag}\".").into_boxed_str())
@@ -49,7 +49,7 @@ impl FlagKind
                 })
             ).collect(),
             Self::File => vec![
-                Example {
+                CallExample {
                     exe,
                     args: vec!["--file".into(), "<path>".into()],
                     effect: Some("Loads a different poengsum-file.".into())

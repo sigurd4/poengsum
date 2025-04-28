@@ -2,20 +2,27 @@ use std::{borrow::Cow, path::{Path, PathBuf}};
 
 use crate::{error::{ArgError, Error, ExpectedArg, InvalidArg, InvalidFlag}, flag::{Flag, FlagKind, FlagOption}, help::Help, round::{Round, Rounds}, run::Run};
 
-enum FlagBuilder
+enum FlagCall
 {
     File
 }
 
-impl FlagBuilder
+impl FlagCall
 {
-    fn new(flag: FlagOption<&str>, parser: &RunBuilder, exe: &'static str) -> Result<Result<Flag, Self>, InvalidArg>
+    fn new(flag: FlagOption<&str>, call: &Call, exe: &'static str) -> Result<Result<Flag, Self>, InvalidArg>
     {
         let flag = FlagKind::try_from(flag)?;
         match flag
         {
-            FlagKind::Help => Ok(Ok(Flag::Help(Help::new(exe)))),
-            FlagKind::File => if let Cow::Owned(_) = &parser.file //TODO: use .is_owned() when stabilized
+            FlagKind::Help => if let Rounds::All = call.rounds
+            {
+                Ok(Ok(Flag::Help(Help::new(exe))))
+            }
+            else
+            {
+                Err(InvalidFlag::HelpAfterInteger.into())
+            },
+            FlagKind::File => if let Cow::Owned(_) = &call.file //TODO: use .is_owned() when stabilized
             {
                 Err(InvalidArg::InvalidFlag {
                     error: InvalidFlag::FileAlreadySpecified
@@ -32,7 +39,7 @@ impl FlagBuilder
     {
         match self
         {
-            FlagBuilder::File => Ok(Ok(Flag::File(PathBuf::from(arg))))
+            FlagCall::File => Ok(Ok(Flag::File(PathBuf::from(arg))))
         }
     }
 
@@ -40,13 +47,13 @@ impl FlagBuilder
     {
         match self
         {
-            FlagBuilder::File => Err(ExpectedArg::Filename)
+            FlagCall::File => Err(ExpectedArg::Filename)
         }
     }
 
-    fn replace_and_collect(self, replace: &mut Option<FlagBuilder>) -> Result<Option<Flag>, ExpectedArg>
+    fn replace_and_collect(self, replace: &mut Option<FlagCall>) -> Result<Option<Flag>, ExpectedArg>
     {
-        if let Some(builder) = replace.replace(self) && let Some(flag) = builder.collect()?
+        if let Some(flag_call) = replace.replace(self) && let Some(flag) = flag_call.collect()?
         {
             Ok(Some(flag))
         }
@@ -57,23 +64,25 @@ impl FlagBuilder
     }
 }
 
-pub struct RunBuilder
+pub struct Call
 {
     exe: Option<&'static str>,
-    flag_builder: Option<FlagBuilder>,
+    flag_call: Option<FlagCall>,
+    flags: Vec<FlagKind>,
     rounds: Rounds,
     file: Cow<'static, Path>,
     help: Option<Help>,
     no: usize
 }
 
-impl RunBuilder
+impl Call
 {
     pub fn new() -> Self
     {
         Self {
             exe: None,
-            flag_builder: None,
+            flag_call: None,
+            flags: Vec::new(),
             rounds: Rounds::All,
             file: Cow::Borrowed(crate::default_file_path()),
             help: None,
@@ -83,9 +92,9 @@ impl RunBuilder
 
     pub fn from_args(args: impl IntoIterator<Item = String>) -> Result<Self, Error>
     {
-        let mut parser = Self::new();
-        parser.parse(args)?;
-        Ok(parser)
+        let mut call = Self::new();
+        call.parse(args)?;
+        Ok(call)
     }
 
     fn next(&mut self, iter: &mut impl Iterator<Item = String>) -> Option<(&'static str, String)>
@@ -112,6 +121,8 @@ impl RunBuilder
 
     fn add_flag(&mut self, flag: Flag) -> Result<(), InvalidFlag>
     {
+        let kind = flag.kind();
+
         let add = || match flag
         {
             Flag::Help(help) => {
@@ -132,15 +143,19 @@ impl RunBuilder
                 Err(InvalidFlag::FileAlreadySpecified)
             },
         };
-        Help::catch(add(), (), self.help.as_mut())
+
+        Help::catch(add(), (), self.help.as_mut())?;
+        self.flags.push(kind);
+
+        Ok(())
     }
 
     fn add_flag_option(&mut self, flag: FlagOption<&str>, exe: &'static str) -> Result<(), ArgError>
     {
-        if let Some(result) = Help::catch(FlagBuilder::new(flag, self, exe), None, self.help.as_mut())? && let Some(flag) = match result
+        if let Some(result) = Help::catch(FlagCall::new(flag, self, exe), None, self.help.as_mut())? && let Some(flag) = match result
         {
             Ok(flag) => Some(flag),
-            Err(flag_builder) => Help::catch(flag_builder.replace_and_collect(&mut self.flag_builder), None, self.help.as_mut())?,
+            Err(flag_call) => Help::catch(flag_call.replace_and_collect(&mut self.flag_call), None, self.help.as_mut())?,
         }
         {
             self.add_flag(flag)?
@@ -237,38 +252,38 @@ impl RunBuilder
                 };
             }
 
-            if let Some(flag_parser) = self.flag_builder.take()
+            if let Some(flag_call) = self.flag_call.take()
             {
-                match flag_parser.parse(self.no, arg.clone() /* :( */)?
+                match flag_call.parse(self.no, arg.clone() /* :( */)?
                 {
                     Ok(flag) => try_of!(self.add_flag(flag)),
-                    Err(flag_parser) => self.flag_builder = Some(flag_parser),
+                    Err(flag_call) => self.flag_call = Some(flag_call),
                 };
                 continue
             }
 
-            fn parse_trimmed(parser: &mut RunBuilder, exe: &'static str, arg: &str) -> Result<(), ArgError>
+            fn parse_trimmed(call: &mut Call, exe: &'static str, arg: &str) -> Result<(), ArgError>
             {
                 if let Some(flags) = arg.trim().strip_prefix("-")
                 {
                     match flags.strip_prefix("-")
                     {
-                        Some(flag) => parser.add_flag_option(FlagOption::Long(flag), exe)?,
+                        Some(flag) => call.add_flag_option(FlagOption::Long(flag), exe)?,
                         None => for flag in flags.chars()
                         {
-                            parser.add_flag_option(FlagOption::Short(flag), exe)?;
+                            call.add_flag_option(FlagOption::Short(flag), exe)?;
                         }
                     }
 
                     return Ok(())
                 }
-                else if parser.help.is_some()
+                else if call.help.is_some()
                 {
                     return Err(InvalidArg::IntegerAfterHelp.into())
                 }
                 else
                 {
-                    parser.rounds.add_round(RunBuilder::parse_round(arg)?);
+                    call.rounds.add_round(Call::parse_round(arg)?);
                 }
 
                 Ok(())
@@ -284,16 +299,18 @@ impl RunBuilder
     {
         let exe = self.exe.ok_or(Error::NoExecutable)?;
 
-        if let Some(flag_parser) = self.flag_builder.take() && let Some(flag) = Help::catch(flag_parser.collect(), None, self.help.as_mut()).map_err(|e| e.at(exe, self.no))?
+        if let Some(flag_call) = self.flag_call.take() && let Some(flag) = Help::catch(flag_call.collect(), None, self.help.as_mut()).map_err(|e| e.at(exe, self.no))?
         {
             self.add_flag(flag).map_err(|e| e.at(exe, self.no, None))?;
         }
 
-        let Self { exe: _, flag_builder, rounds, file, help, no } = self;
-        let _ = (flag_builder, no);
+        let Self { exe: _, flag_call, mut flags, rounds, file, help, no } = self;
+        let _ = (flag_call, no);
 
-        if let Some(help) = help
+        if let Some(mut help) = help
         {
+            flags.retain(|flag| *flag != FlagKind::Help);
+            help.prepend_flags(flags);
             return Err(Error::ShowHelp {
                 help
             })

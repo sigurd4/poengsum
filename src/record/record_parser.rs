@@ -52,6 +52,7 @@ impl RecordParser
         {
             return Err(InvalidSyntax::UnnamedTeam {
                 row: self.row,
+                col: 0..col,
                 line
             })
         }

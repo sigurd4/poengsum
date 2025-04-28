@@ -69,7 +69,7 @@ fn main()
 
 fn run(args: impl Iterator<Item = String>) -> Result<(), Error>
 {
-    RunBuilder::from_args(args)?.collect()?.scores()?.present();
+    Call::from_args(args)?.collect()?.scores()?.present();
 
     Ok(())
 }
