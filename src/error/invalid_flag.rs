@@ -1,6 +1,8 @@
+use crate::flag::FlagKind;
+
 use super::{Error, InvalidArg};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum InvalidFlag
 {
     FileAlreadySpecified
@@ -16,8 +18,16 @@ impl From<InvalidFlag> for InvalidArg
 
 impl InvalidFlag
 {
-    pub fn at(self, no: usize, arg: Option<Box<str>>) -> Error
+    pub fn at(self, exe: &'static str, no: usize, arg: Option<Box<str>>) -> Error
     {
-        InvalidArg::from(self).at(no, arg)
+        InvalidArg::from(self).at(exe, no, arg)
+    }
+
+    pub fn related_flag(&self) -> FlagKind
+    {
+        match self
+        {
+            Self::FileAlreadySpecified => FlagKind::File
+        }
     }
 }

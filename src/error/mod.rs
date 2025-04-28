@@ -1,7 +1,7 @@
 use core::fmt::Display;
 use std::{borrow::Cow, io::ErrorKind, path::Path};
 
-use crate::Help;
+use crate::{flag::FlagKind, help::{FlagHelp, Help}, FlagsUsages};
 
 moddef::moddef!(
     flat(pub) mod {
@@ -25,12 +25,17 @@ pub enum Error
         error: InvalidRead
     },
     InvalidCall {
+        exe: &'static str,
         no: usize,
         error: InvalidCall
     },
     InsufficientData {
         error: InsufficientData
-    }
+    },
+    ShowHelp {
+        help: Help
+    },
+    NoExecutable
 }
 
 impl Error
@@ -120,7 +125,7 @@ impl Display for Error
                     },
                 }
             },
-            Self::InvalidCall { no, error } => {
+            Self::InvalidCall { exe, no, error } => {
                 let nth = nth(*no);
                 match error
                 {
@@ -130,34 +135,59 @@ impl Display for Error
                             .unwrap_or_else(String::new);
                         match error
                         {
+                            InvalidArg::CannotParseInteger { error } => writeln!(f,
+                                "Unable to parse the {nth} commandline argument{arg}: {error}."
+                            )?,
+                            _ => writeln!(f,
+                                "The {nth} argument{arg} is invalid."
+                            )?
+                        }
+                        match error
+                        {
                             InvalidArg::UseTwoDots => write!(f,
-                                "The {nth} argument{arg} is invalid.\nDid you mean to write '..' instead of '.'?"
+                                "Did you mean to write '..' instead of '.'?"
                             ),
-                            InvalidArg::CannotParseInteger { error } => write!(f,
-                                "Unable to parse the {nth} commandline argument{arg}: {error}.\nThis must be a valid number (a nonzero integer)."
+                            InvalidArg::CannotParseInteger { error: _ } => write!(f,
+                                "This must be a valid number (a nonzero integer)."
                             ),
                             InvalidArg::NotInOrder { start, end } => write!(f,
-                                "The {nth} argument{arg} is invalid.\nRanges cannot be in reverse.\n{start} is larger than {end}, but this is not supported."
+                                "{start} is larger than {end}, but this is not supported."
                             ),
                             InvalidArg::RoundZero => write!(f,
-                                "The {nth} argument{arg} is invalid.\n0 is not a valid round! Rounds start at 1, not 0."
+                                "0 is not a valid round! Rounds start at 1, not 0."
                             ),
                             InvalidArg::NonexistentFlag { flag } => {
                                 writeln!(f,
-                                    "The {nth} argument{arg} is invalid.\nThere is no available option with the name \"{flag}\"."
+                                    "There is no available option with the name \"{flag}\"."
                                 )?;
-                                let examples = Help::flags_examples();
-                                write!(f, "{examples}")
+                                let usage = FlagsUsages {
+                                    exe: &*exe
+                                };
+                                write!(f, "{usage}")
                             },
                             InvalidArg::InvalidFlag { error } => match error
                             {
                                 InvalidFlag::FileAlreadySpecified => {
-                                    let default_file = crate::default_file_path().display();
+                                    let help = FlagHelp {
+                                        exe: &*exe,
+                                        flag: FlagKind::File,
+                                        extra: Some("You're not allowed to set multiple files.")
+                                    };
                                     write!(f,
-                                        "The {nth} argument{arg} is invalid.\nYou've already specified a filename.\nBy default, the file that the score is read from is \"{default_file}\", but you can use a different file by setting the \"--file\" flag, followed by a path.\nYou're not allowed to set multiple files."
+                                        "You've already specified a filename.\n{help}"
                                     )
                                 }
                             },
+                            InvalidArg::IntegerAfterHelp => {
+                                let help = FlagHelp {
+                                    exe: &*exe,
+                                    flag: FlagKind::Help,
+                                    extra: None
+                                };
+                                write!(f,
+                                    "Didn't expect {arg} after \"--help\".\n{help}"
+                                )
+                            }
                         }
                     },
                     InvalidCall::ExpectedArg { error } => match error
@@ -179,7 +209,11 @@ impl Display for Error
                 InsufficientData::RoundNotYet { round, final_round: last_round } => write!(f,
                     "Round {round} hasn't happened yet.\nThere has only been {last_round} rounds so far!"
                 ),
-            }
+            },
+            Self::ShowHelp { help } => write!(f, "{help}"),
+            Self::NoExecutable => write!(f, 
+                "You somehow managed to run this binary without even a 0th argument. That won't work!"
+            )
         }
     }
 }

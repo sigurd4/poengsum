@@ -10,13 +10,21 @@ moddef::moddef!(
         flag,
         record,
         round,
-        score
-    },
-    mod {
+        score,
         help
     }
 );
-pub use help::Help;
+
+fn catch<T, U, E, E2>(result: Result<T, E>, or: U, catch: impl FnOnce(E) -> Result<(), E2>) -> Result<U, E2>
+where
+    T: Into<U>
+{
+    match result
+    {
+        Ok(ok) => Ok(ok.into()),
+        Err(err) => catch(err).map(|()| or)
+    }
+}
 
 // TODO: use .try_collect from std once stabilized
 fn try_collect<C, T, E>(iter: &mut impl Iterator<Item = Result<T, E>>) -> Result<C, E>

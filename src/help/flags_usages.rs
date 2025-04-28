@@ -1,10 +1,13 @@
 use core::fmt::Display;
 
-use crate::{flag::Flag, help::FlagExample};
+use crate::{flag::Flag, help::FlagUsage};
 
-pub struct FlagsExamples;
+pub struct FlagsUsages<'a>
+{
+    pub exe: &'a str
+}
 
-impl Display for FlagsExamples
+impl<'a> Display for FlagsUsages<'a>
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
     {
@@ -16,7 +19,10 @@ impl Display for FlagsExamples
     
         for flag in Flag::VARIANTS
         {
-            let flag_example = FlagExample(flag);
+            let flag_example = FlagUsage {
+                exe: self.exe,
+                flag
+            };
             write!(f, "\n\t{flag_example}")?;
         }
     

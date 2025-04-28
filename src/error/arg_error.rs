@@ -30,12 +30,12 @@ impl From<ExpectedArg> for ArgError
 
 impl ArgError
 {
-    pub fn at(self, no: usize, arg: Option<Box<str>>) -> Error
+    pub fn at(self, exe: &'static str, no: usize, arg: Option<Box<str>>) -> Error
     {
         match self
         {
-            ArgError::InvalidArg(err) => err.at(no, arg),
-            ArgError::ExpectedArg(err) => err.at(no),
+            ArgError::InvalidArg(err) => err.at(exe, no, arg),
+            ArgError::ExpectedArg(err) => err.at(exe, no),
         }
     }
 }

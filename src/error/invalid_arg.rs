@@ -21,7 +21,8 @@ pub enum InvalidArg
     },
     InvalidFlag {
         error: InvalidFlag
-    }
+    },
+    IntegerAfterHelp
 }
 
 impl From<ParseIntError> for InvalidArg
@@ -36,9 +37,10 @@ impl From<ParseIntError> for InvalidArg
 
 impl InvalidArg
 {
-    pub fn at(self, no: usize, arg: Option<Box<str>>) -> Error
+    pub fn at(self, exe: &'static str, no: usize, arg: Option<Box<str>>) -> Error
     {
         Error::InvalidCall {
+            exe,
             no,
             error: InvalidCall::InvalidArg {
                 arg,

@@ -7,9 +7,10 @@ pub enum ExpectedArg
 }
 impl ExpectedArg
 {
-    pub fn at(self, no: usize) -> Error
+    pub fn at(self, exe: &'static str, no: usize) -> Error
     {
         Error::InvalidCall {
+            exe,
             no,
             error: InvalidCall::ExpectedArg {
                 error: self
