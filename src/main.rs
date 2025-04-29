@@ -87,7 +87,10 @@ mod tests
     {
         match crate::run(args)
         {
-            Err(error @ Error::ShowHelp { help: _ } | error @ Error::InsufficientData { error: _ }) => {
+            Err(
+                error @ Error::ShowHelp { help: _ }
+                | error @ Error::InsufficientData { error: _ }
+            ) => {
                 eprintln!("{error}");
                 Ok(())
             },
