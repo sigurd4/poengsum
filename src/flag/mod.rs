@@ -12,7 +12,8 @@ moddef::moddef!(
 pub enum Flag
 {
     Help(Help),
-    File(PathBuf)
+    File(PathBuf),
+    Rev,
 }
 
 impl Flag
@@ -25,7 +26,8 @@ impl Flag
         match self
         {
             Self::Help(..) => FlagKind::Help,
-            Self::File(..) => FlagKind::File
+            Self::File(..) => FlagKind::File,
+            Self::Rev => FlagKind::Rev
         }
     }
 }

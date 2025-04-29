@@ -40,7 +40,8 @@ impl Display for Score
 
 pub struct Scores
 {
-    scores: Vec<Score>
+    scores: Vec<Score>,
+    rev: bool
 }
 
 impl Scores
@@ -49,9 +50,19 @@ impl Scores
     {
         self.sort();
     
-        for score in self.scores
+        if self.rev
         {
-            println!("{score}");
+            for score in self.scores.into_iter().rev()
+            {
+                println!("{score}");
+            }
+        }
+        else
+        {
+            for score in self.scores
+            {
+                println!("{score}");
+            }
         }
     }
 
@@ -88,9 +99,9 @@ impl Scores
         }
     }
 
-    pub fn new(records: Records, rounds: Rounds) -> Result<Scores, InsufficientData>
+    pub fn new(records: Records, rounds: Rounds, rev: bool) -> Result<Scores, InsufficientData>
     {
-        fn scores_no_climb(records: Records, rounds: BoundedRounds) -> Scores
+        fn scores_no_climb(records: Records, rounds: BoundedRounds, rev: bool) -> Scores
         {
             let mut scores = Scores {
                 scores: records.into_iter()
@@ -105,7 +116,8 @@ impl Scores
                         climb: 0,
                         place: 0,
                         uid
-                    }).collect::<Vec<_>>()
+                    }).collect::<Vec<_>>(),
+                rev
             };
             scores.sort();
             scores
@@ -117,10 +129,11 @@ impl Scores
             .undo()
             .map(|prev_rounds| scores_no_climb(
                 records.clone(),
-                prev_rounds
+                prev_rounds,
+                rev
             ));
 
-        let mut scores = scores_no_climb(records, rounds);
+        let mut scores = scores_no_climb(records, rounds, rev);
 
         if let Some(prev_scores) = prev_scores
         {

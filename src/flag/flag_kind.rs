@@ -9,7 +9,8 @@ use super::{Flag, FlagOption};
 pub enum FlagKind
 {
     Help,
-    File
+    File,
+    Rev
 }
 
 impl FlagKind
@@ -20,6 +21,7 @@ impl FlagKind
         {
             Self::Help => "help",
             Self::File => "file",
+            Self::Rev => "rev"
         }
     }
     pub fn option_short(self) -> char
@@ -53,6 +55,13 @@ impl FlagKind
                     exe,
                     args: vec!["--file".into(), "<path>".into()],
                     effect: Some("Loads a different poengsum-file.".into())
+                }
+            ],
+            Self::Rev => vec![
+                CallExample {
+                    exe,
+                    args: vec!["--rev".into()],
+                    effect: Some("Displays the leaderboard in reverse.".into())
                 }
             ]
         }

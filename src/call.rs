@@ -31,7 +31,8 @@ impl FlagCall
             else
             {
                 Ok(Err(Self::File))
-            }
+            },
+            FlagKind::Rev => Ok(Ok(Flag::Rev))
         }
     }
 
@@ -72,6 +73,7 @@ pub struct Call
     rounds: Rounds,
     file: Cow<'static, Path>,
     help: Option<Help>,
+    rev: bool,
     no: usize
 }
 
@@ -86,6 +88,7 @@ impl Call
             rounds: Rounds::All,
             file: Cow::Borrowed(crate::default_file_path()),
             help: None,
+            rev: false,
             no: 0
         }
     }
@@ -138,6 +141,10 @@ impl Call
             {
                 Err(InvalidFlag::FileAlreadySpecified)
             },
+            Flag::Rev => {
+                self.rev ^= true;
+                Ok(())
+            }
         };
 
         Help::catch(add(), (), self.help.as_mut())?;
@@ -300,7 +307,7 @@ impl Call
             self.add_flag(flag).map_err(|e| e.at(exe, self.no, None))?;
         }
 
-        let Self { exe: _, flag_call, mut flags, rounds, file, help, no } = self;
+        let Self { exe: _, flag_call, mut flags, rounds, file, help, rev, no } = self;
         let _ = (flag_call, no);
 
         if let Some(mut help) = help
@@ -312,6 +319,6 @@ impl Call
             })
         }
 
-        Run::new(rounds, file)
+        Run::new(rounds, file, rev)
     }
 }

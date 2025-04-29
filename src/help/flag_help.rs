@@ -31,7 +31,8 @@ impl Display for FlagHelp
                 ),
                 FlagKind::File => format!(
                     "By default, the file that the score is read from is \"{default_file}\", but you can use a different file by setting the \"--file\" flag, followed by a path."
-                )
+                ),
+                FlagKind::Rev => "Displays the leaderboard in reverse.".into()
             }
         );
 
