@@ -24,7 +24,7 @@ impl Display for Rules
 
         if !examples.is_empty()
         {
-            writeln!(f, "\n{header}", header = style::header("Example file:"))?;
+            writeln!(f, "\n{header}", header = style::header("Example:"))?;
             for example in examples
             {
                 writeln!(f, "\t{example}")?;
