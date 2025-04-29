@@ -9,8 +9,8 @@ const CLIMB_UP_COLOR: Color = Color::Green;
 const CLIMB_DOWN_COLOR: Color = Color::Red;
 
 const PLACE_COLOR: Color = Color::White;
-const TEAM_COLOR: Color = Color::Purple;
-const ROUND_COLOR: Color = Color::Green;
+const TEAM_COLOR: Color = Color::RGB(255/2, 255/2, 0);
+const ROUND_COLOR: Color = Color::White;
 
 const EXE_COLOR: Color = Color::Blue;
 const ARG_COLOR: Color = Color::Cyan;
