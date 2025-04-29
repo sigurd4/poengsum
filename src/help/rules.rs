@@ -1,6 +1,6 @@
 use core::fmt::Display;
 
-use colored::Colorize;
+use crate::style;
 
 use super::LineExample;
 
@@ -20,7 +20,7 @@ impl Display for Rules
 
         if !examples.is_empty()
         {
-            writeln!(f, "{header}", header = "Example:".bold())?;
+            writeln!(f, "{header}", header = style::header("Example:"))?;
             for example in examples
             {
                 writeln!(f, "\t{example}")?;
@@ -28,6 +28,6 @@ impl Display for Rules
             writeln!(f, "")?;
         }
 
-        write!(f, "{rules}", rules = "One team on each line, followed by a ':', then the team's points for each round separated by whitespace.".italic().bright_black())
+        write!(f, "{rules}", rules = style::info("One team on each line, followed by a ':', then the team's points for each round separated by whitespace."))
     }
 }

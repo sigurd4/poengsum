@@ -12,6 +12,10 @@ moddef::moddef!(
         round,
         score,
         help
+    },
+    mod {
+        style,
+        terminal
     }
 );
 

@@ -1,8 +1,6 @@
 use core::fmt::Display;
 
-use colored::Colorize;
-
-use crate::flag::FlagKind;
+use crate::{flag::FlagKind, style};
 
 use super::FlagUsage;
 
@@ -25,15 +23,17 @@ impl Display for FlagHelp
 
         let default_file = crate::default_file_path().display();
         
-        let help = match self.flag
-        {
-            FlagKind::Help => format!(
-                "The flag \"--help\" can be used to display instructions on how to use \"{exe}\", and with various different flags."
-            ),
-            FlagKind::File => format!(
-                "By default, the file that the score is read from is \"{default_file}\", but you can use a different file by setting the \"--file\" flag, followed by a path."
-            )
-        }.italic().bright_black();
+        let help = style::info(
+            match self.flag
+            {
+                FlagKind::Help => format!(
+                    "The flag \"--help\" can be used to display instructions on how to use \"{exe}\", and with various different flags."
+                ),
+                FlagKind::File => format!(
+                    "By default, the file that the score is read from is \"{default_file}\", but you can use a different file by setting the \"--file\" flag, followed by a path."
+                )
+            }
+        );
 
         write!(f, "{usage}\n\n{help}")?;
 

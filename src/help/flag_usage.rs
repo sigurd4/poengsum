@@ -1,8 +1,6 @@
 use core::fmt::Display;
 
-use colored::Colorize;
-
-use crate::flag::FlagKind;
+use crate::{flag::FlagKind, style};
 
 pub struct FlagUsage
 {
@@ -18,7 +16,7 @@ impl Display for FlagUsage
         let opt_short = self.flag.option_short();
         let examples = self.flag.examples(self.exe);
         
-        write!(f, "{header}", header = format!("Usage of --{opt} or -{opt_short}:").bold())?;
+        write!(f, "{header}", header = style::header(format!("Usage of --{opt} or -{opt_short}:").as_str()))?;
 
         for example in examples
         {

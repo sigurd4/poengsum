@@ -1,6 +1,6 @@
 use core::fmt::Display;
 
-use colored::Colorize;
+use crate::style;
 
 use super::CallExample;
 
@@ -42,7 +42,7 @@ impl Display for ArgUsage
             return Ok(())
         }
 
-        write!(f, "{header}", header = "Usage:".bold())?;
+        write!(f, "{header}", header = style::header("Usage:"))?;
 
         for example in examples
         {

@@ -1,6 +1,6 @@
 use core::fmt::Display;
 
-use colored::Colorize;
+use crate::style;
 
 use super::ALIGN;
 
@@ -17,20 +17,20 @@ impl Display for CallExample
     {
         let mut align = ALIGN;
 
-        let exe = self.exe.blue();
+        let exe = style::exe(self.exe);
         align = align.saturating_sub(1 + exe.len());
         write!(f, "{exe}")?;
 
         for arg in self.args.iter()
         {
-            let arg = arg.cyan();
+            let arg = style::arg(&**arg);
             align = align.saturating_sub(1 + arg.len());
             write!(f, " {arg}")?;
         }
 
         if let Some(effect) = self.effect.as_ref()
         {
-            let effect = effect.italic().bright_black();
+            let effect = style::info(&**effect);
             write!(f, "{empty:>align$} {effect}", empty = "")?;
         }
 

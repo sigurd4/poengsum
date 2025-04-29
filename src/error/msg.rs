@@ -1,10 +1,9 @@
 use core::{error::Error, fmt::Display, ops::Range};
 use std::path::Path;
 
-use colored::{Color, Colorize};
+use crate::{help::Docs, style};
 
-use crate::help::Docs;
-
+#[derive(Clone, Copy)]
 pub enum Severity
 {
     //Warning,
@@ -26,12 +25,6 @@ impl Display for OffendingLine<'_>
     {
         let Self { file, severity, line, row, col } = self;
 
-        let severity_color = match severity
-        {
-            //Severity::Warning => Color::Yellow,
-            Severity::Error => Color::Red,
-        };
-
         let in_file = {
             let file = file.display();
             let at_col = match col.as_ref().map(|col| col.start)
@@ -47,14 +40,13 @@ impl Display for OffendingLine<'_>
             {
                 ""
             };
-            format!("In {file} (line: {row}{at_col}){colon}").bold()
+            style::header(format!("In {file} (line: {row}{at_col}){colon}"))
         };
         write!(f, "{in_file}")?;
 
         if let Some(line) = *line
         {
             let mut line = line.to_string();
-            line.push(' ');
             let row = format!("{row} | ");
             let (col, [line_before, line, line_after]) = match col
             {
@@ -62,6 +54,7 @@ impl Display for OffendingLine<'_>
                     (0, ["", &line, ""])
                 },
                 Some(Range { start, end }) => {
+                    line.push(' ');
                     let end = (*end).min(line.len());
                     let start = (*start).min(end);
                     let (line_before, line) = line.split_at(start);
@@ -70,12 +63,12 @@ impl Display for OffendingLine<'_>
                     (start, [line_before, line, line_after])
                 }
             };
-            write!(f, "\n{arrow}\n{row}", arrow = format!("{v:>offset$}", offset = col + row.len() + 1, v = "v").color(severity_color))?;
+            write!(f, "\n{arrow}\n{row}", arrow = style::syntax_arrow(col + row.len() + 1, *severity))?;
 
             let lines = [
-                line_before.bright_black(),
-                line.color(severity_color).underline(),
-                line_after.bright_black()
+                style::line(line_before),
+                style::syntax_line(line, *severity),
+                style::line(line_after)
             ];
 
             for line in lines
@@ -103,31 +96,32 @@ impl Display for Msg<'_>
     {
         let Self { msg, error, line, hint, docs } = self;
 
-        let msg = format!("{msg}").italic().bright_black();
+        let msg = style::info(format!("{msg}"));
         write!(f, "{msg}")?;
 
         if let Some(error) = error
         {
-            let error = format!("Error: {error}.").red();
+            let error = style::error(format!("Error: {error}."));
             write!(f, "\n\n{error}")?;
         }
         if let Some(line) = line
         {
             write!(f, "\n\n{line}")?;
         }
-        if let Some(docs) = docs
-        {
-            write!(f, "\n\n{docs}")?;
-        }
 
         if let Some(hint) = hint
         {
-            if line.is_some() || error.is_some() || docs.is_some()
+            if line.is_some() || error.is_some() //|| docs.is_some()
             {
                 write!(f, "\n")?;
             }
-            let hint = format!("{hint}").italic().bright_black();
+            let hint = style::info(&**hint);
             write!(f, "\n{hint}")?;
+        }
+
+        if let Some(docs) = docs
+        {
+            write!(f, "\n\n{docs}")?;
         }
 
         Ok(())

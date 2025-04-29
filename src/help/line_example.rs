@@ -1,6 +1,6 @@
 use core::fmt::Display;
 
-use colored::Colorize;
+use crate::style;
 
 use super::ALIGN;
 
@@ -18,15 +18,15 @@ impl Display for LineExample
         let Self {team, points, effect} = self;
         let mut align = ALIGN;
 
-        let team = format!("{team}:").red();
-        let points = points.white();
+        let team = style::team(format!("{team}:"));
+        let points = style::points(&**points);
 
         align = align.saturating_sub(team.len() + points.len() + 2);
         write!(f, "{team} {points}")?;
 
         if let Some(effect) = effect.as_ref()
         {
-            let effect = effect.italic().bright_black();
+            let effect = style::info(&**effect);
             write!(f, "{empty:>align$} {effect}", empty = "")?;
         }
 

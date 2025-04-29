@@ -1,15 +1,13 @@
 use core::{cmp::Ordering, fmt::Display};
 
-use colored::Colorize;
-
-use crate::{error::InsufficientData, record::Records, round::{BoundedRounds, Rounds}};
+use crate::{error::InsufficientData, record::Records, round::{BoundedRounds, Rounds}, style};
 
 #[derive(PartialEq, Clone)]
 pub struct Score
 {
     pub team: Box<str>,
     pub points: f64,
-    pub plass: usize,
+    pub place: usize,
     pub climb: isize,
     pub uid: usize
 }
@@ -30,14 +28,13 @@ impl Display for Score
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
     {
-        let climb = match self.climb.cmp(&0)
-        {
-            Ordering::Greater => format!(" ↑{}", self.climb.unsigned_abs()).green(),
-            Ordering::Equal => "".into(),
-            Ordering::Less => format!(" ↓{}", self.climb.unsigned_abs()).red()
-        };
-
-        write!(f, "{}. {}: {}{}", self.plass, self.team, self.points, climb)
+        let Self { team, points, place, climb, uid: _ } = self;
+        write!(f, "{place} {team} {points}{climb}",
+            place = style::place(*place),
+            team = style::team(format!("{team}:", team = &**team).as_str()),
+            points = style::points(format!("{points}").as_str()),
+            climb = style::climb(*climb)
+        )
     }
 }
 
@@ -73,7 +70,7 @@ impl Scores
                 j = i + 1;
                 prev = Some(score.points);
             }
-            score.plass = j
+            score.place = j
         }
     }
 
@@ -85,7 +82,7 @@ impl Scores
             {
                 if other.uid == score.uid
                 {
-                    score.climb = crate::checked_signed_diff(other.plass, score.plass).unwrap_or(0)
+                    score.climb = crate::checked_signed_diff(other.place, score.place).unwrap_or(0)
                 }
             }
         }
@@ -106,7 +103,7 @@ impl Scores
                             .copied()
                             .sum(),
                         climb: 0,
-                        plass: 0,
+                        place: 0,
                         uid
                     }).collect::<Vec<_>>()
             };
