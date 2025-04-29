@@ -68,7 +68,7 @@ impl Display for OffendingLine<'_>
                     }
                 }
             };
-            write!(f, "\n{arrow}\n{row}", arrow = style::syntax_arrow(line_before.chars().count() + row.chars().count(), *severity))?;
+            write!(f, "\n{arrow}\n{row}", arrow = style::syntax_arrow(line_before.chars().count() + row.chars().count(), *severity), row = style::row(row))?;
 
             let lines = [
                 style::line(line_before),

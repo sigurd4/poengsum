@@ -23,12 +23,12 @@ impl Display for LineExample
         let points = style::points_line(&**points);
 
         align = align.saturating_sub(team.len() + points.len() + 2);
-        write!(f, "{row} | {team} {points}")?;
+        write!(f, "{row_l}{team} {points}", row_l = style::row(format!("{row} | ")))?;
 
         if let Some(effect) = effect.as_ref()
         {
             let effect = style::info(&**effect);
-            write!(f, "{empty:>align$} {effect}", empty = "")?;
+            write!(f, "{empty:>align$} \t{effect}", empty = "")?;
         }
 
         Ok(())

@@ -21,6 +21,7 @@ const ERROR_COLOR: Color = Color::Fixed(1);
 const LINE_COLOR: Color = Color::Fixed(8);
 const TEAM_LINE_COLOR: Color = Color::Fixed(221);
 const POINTS_LINE_COLOR: Color = Color::White;
+const ROW_COLOR: Color = Color::Fixed(240);
 
 pub fn place(place: usize) -> ANSIString<'static>
 {
@@ -134,4 +135,10 @@ where
     T: Into<Cow<'a, str>>
 {
     POINTS_LINE_COLOR.paint(input)
+}
+pub fn row<'a, T>(input: T) -> ANSIString<'a>
+where
+    T: Into<Cow<'a, str>>
+{
+    ROW_COLOR.paint(input)
 }
