@@ -81,7 +81,19 @@ fn run(args: impl Iterator<Item = String>) -> Result<(), Error>
 #[cfg(test)]
 mod tests
 {
-    use crate::error::Error;
+    use crate::{error::Error, flag::Flag, help::ArgUsage};
+
+    fn test(args: impl Iterator<Item = String>) -> Result<(), Error>
+    {
+        match crate::run(args)
+        {
+            Err(error @ Error::ShowHelp { help: _ } | error @ Error::InsufficientData { error: _ }) => {
+                eprintln!("{error}");
+                Ok(())
+            },
+            result => result
+        }
+    }
 
     #[test]
     fn it_works() -> Result<(), Error>
@@ -99,6 +111,21 @@ mod tests
 
         crate::run(["poengsum", "--file", "poengsum.txt"].into_iter().map(String::from))?;
         crate::run(["poengsum", "-f", "poengsum.txt"].into_iter().map(String::from))?;
+
+        for example in (ArgUsage {
+            exe: "poengsum"
+        }).examples()
+        {
+            test(example.into_args())?;
+        }
+
+        for flag in Flag::VARIANTS
+        {
+            for example in flag.examples("poengsum")
+            {
+                test(example.into_args())?;
+            }
+        }
 
         Ok(())
     }

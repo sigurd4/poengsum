@@ -11,6 +11,20 @@ pub struct CallExample
     pub effect: Option<Box<str>>
 }
 
+impl CallExample
+{
+    #[cfg(test)]
+    pub fn into_args(self) -> impl Iterator<Item = String>
+    {
+        let Self {exe, args, effect: _} = self;
+
+        core::iter::once(exe.to_string())
+            .chain(args.into_iter()
+                .map(|arg| arg.into_string())
+            )
+    }
+}
+
 impl Display for CallExample
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result

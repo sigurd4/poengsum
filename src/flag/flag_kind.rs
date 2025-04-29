@@ -53,7 +53,7 @@ impl FlagKind
             Self::File => vec![
                 CallExample {
                     exe,
-                    args: vec!["--file".into(), "<path>".into()],
+                    args: vec!["--file".into(), crate::default_file_path().to_string_lossy().into()],
                     effect: Some("Loads a different poengsum-file.".into())
                 }
             ],

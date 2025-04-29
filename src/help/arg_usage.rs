@@ -8,13 +8,13 @@ pub struct ArgUsage {
     pub exe: &'static str
 }
 
-impl Display for ArgUsage
+impl ArgUsage
 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
+    pub fn examples(&self) -> [CallExample; 4]
     {
         let Self { exe } = self;
-    
-        let examples = [
+        
+        [
             CallExample {
                 exe,
                 args: vec![],
@@ -35,7 +35,15 @@ impl Display for ArgUsage
                 args: vec!["1".into(), "3".into(), "5..7".into(), "9".into()],
                 effect: Some("Ranges can be used to include a contiguous sequence of rounds.".into())
             }
-        ];
+        ]
+    }
+}
+
+impl Display for ArgUsage
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
+    {
+        let examples = self.examples();
 
         if examples.is_empty()
         {
