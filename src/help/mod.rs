@@ -174,7 +174,8 @@ impl Display for Help
         let flags_usage = FlagsUsages {
             exe
         };
-        write!(f, "{arg_usage}\n\n{flags_usage}")
+        let rules = Rules;
+        write!(f, "{rules}\n\n{arg_usage}\n\n{flags_usage}")
     }
 }
 

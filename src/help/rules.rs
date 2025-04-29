@@ -18,9 +18,13 @@ impl Display for Rules
             }
         ];
 
+        let default_file = crate::default_file_path().display();
+
+        writeln!(f, "{rules}", rules = style::info(format!("\"poengsum\" looks for a poengsum-file (\"{default_file}\" by default) and displays a leaderboard for all the teams listed in it, given the points they got for each round.")))?;
+
         if !examples.is_empty()
         {
-            writeln!(f, "{header}", header = style::header("Example:"))?;
+            writeln!(f, "\n{header}", header = style::header("Example file:"))?;
             for example in examples
             {
                 writeln!(f, "\t{example}")?;
