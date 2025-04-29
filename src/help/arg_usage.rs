@@ -37,7 +37,7 @@ impl Display for ArgUsage
             }
         ];
 
-        if examples.len() == 0
+        if examples.is_empty()
         {
             return Ok(())
         }

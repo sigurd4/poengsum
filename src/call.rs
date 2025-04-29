@@ -104,18 +104,14 @@ impl Call
             Some(exe) => exe,
             None => {
                 self.exe = iter.next().map(|next| next.leak() as &str);
-                match self.exe
-                {
-                    Some(exe) => exe,
-                    None => return None
-                }
+                self.exe?
             }
         };
         let next = iter.next();
-        next.and_then(|next| {
+        next.map(|next| {
             self.no += 1;
 
-            Some((exe, next))
+            (exe, next)
         })
     }
 

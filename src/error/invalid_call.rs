@@ -22,7 +22,7 @@ impl InvalidCall
                 let arg = arg.as_ref()
                     .map(|arg| format!(" \"{arg}\""))
                     .unwrap_or_else(String::new);
-                error.msg(exe, no, &*arg)
+                error.msg(exe, no, &arg)
             }
             InvalidCall::ExpectedArg { error } => error.msg(exe, no),
         }

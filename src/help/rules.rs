@@ -25,7 +25,7 @@ impl Display for Rules
             {
                 writeln!(f, "\t{example}")?;
             }
-            writeln!(f, "")?;
+            writeln!(f)?;
         }
 
         write!(f, "{rules}", rules = style::info("One team on each line, followed by a ':', then the team's points for each round separated by whitespace."))

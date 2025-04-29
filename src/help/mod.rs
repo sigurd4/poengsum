@@ -143,11 +143,13 @@ impl Display for Help
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
     {
-        let mut flags = self.flags.iter();
+        let Self { exe, flags } = self;
+
+        let mut flags = flags.iter();
         if let Some(&flag) = flags.next()
         {
             let help = FlagHelp {
-                exe: &*self.exe,
+                exe,
                 flag
             };
 
@@ -156,7 +158,7 @@ impl Display for Help
             for &flag in flags
             {
                 let help = FlagHelp {
-                    exe: &*self.exe,
+                    exe,
                     flag
                 };
 
@@ -167,10 +169,10 @@ impl Display for Help
         }
         
         let arg_usage = ArgUsage {
-            exe: &*self.exe
+            exe
         };
         let flags_usage = FlagsUsages {
-            exe: &*self.exe
+            exe
         };
         write!(f, "{arg_usage}\n\n{flags_usage}")
     }

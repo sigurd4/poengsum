@@ -24,7 +24,7 @@ impl InvalidIO
             ErrorKind::NotFound => if file == crate::default_file_path()
             {
                 (
-                    Some(format!("If it doesn't exist, create it!").into_boxed_str()),
+                    Some("If it doesn't exist, create it!".into()),
                     Some(Docs::Rules(Rules))
                 )
             }

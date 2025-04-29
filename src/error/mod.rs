@@ -57,7 +57,7 @@ impl Error
     {
         match self
         {
-            Error::InvalidRead { file, error } => error.msg(&*file),
+            Error::InvalidRead { file, error } => error.msg(file),
             Error::InvalidCall { exe, no, error } => error.msg(exe, *no),
             Error::InsufficientData { error } => error.msg(),
             Error::NoExecutable => Msg {

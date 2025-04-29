@@ -118,7 +118,7 @@ impl Display for Msg<'_>
         {
             if line.is_some() || error.is_some() //|| docs.is_some()
             {
-                write!(f, "\n")?;
+                writeln!(f)?;
             }
             let hint = style::info(&**hint);
             write!(f, "\n{hint}")?;

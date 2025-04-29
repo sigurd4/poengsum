@@ -19,7 +19,7 @@ impl Display for FlagsUsages
     
         for flag in Flag::VARIANTS
         {
-            write!(f, "\n")?;
+            writeln!(f)?;
 
             let flag_example = FlagUsage {
                 exe: self.exe,
