@@ -28,6 +28,22 @@ impl FlagKind
     {
         self.option().chars().next().unwrap()
     }
+    pub fn help(self, exe: &'static str) -> String
+    {
+        match self
+        {
+            FlagKind::Help => format!(
+                "The flag \"--help\" can be used to display instructions on how to use \"{exe}\", and with various different flags."
+            ),
+            FlagKind::File => {
+                let default_file = crate::default_file_path().display();
+                format!(
+                    "By default, the file that the score is read from is \"{default_file}\", but you can use a different file by setting the \"--file\" flag, followed by a path."
+                )
+            },
+            FlagKind::Rev => "Reverses the direction in which the teams' score is shown in the scoreboard.".into()
+        }
+    }
     pub fn examples(self, exe: &'static str) -> Vec<CallExample>
     {
         match self
