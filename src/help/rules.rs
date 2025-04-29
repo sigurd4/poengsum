@@ -14,7 +14,8 @@ impl Display for Rules
             LineExample {
                 team: "Quizzbuzz".into(),
                 points: "3 5 15".into(),
-                effect: Some("A team that got 3 points in the first round, then 5, and then 15 in the final.".into())
+                effect: Some("A team that got 3 points in the first round, then 5, and then 15 in the final.".into()),
+                row: 1
             }
         ];
 
@@ -25,9 +26,9 @@ impl Display for Rules
         if !examples.is_empty()
         {
             writeln!(f, "\n{header}", header = style::header("Example:"))?;
-            for example in examples
+            for example in examples.into_iter()
             {
-                writeln!(f, "\t{example}")?;
+                writeln!(f, "{example}")?;
             }
             writeln!(f)?;
         }
