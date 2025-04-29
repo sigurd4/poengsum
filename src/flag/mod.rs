@@ -18,8 +18,8 @@ pub enum Flag
 
 impl Flag
 {
-    pub const VARIANT_COUNT: usize = 2; //core::mem::variant_count::<FlagKind>(); TODO use this instead when stable
-    pub const VARIANTS: [FlagKind; Self::VARIANT_COUNT] = [FlagKind::Help, FlagKind::File];
+    pub const VARIANT_COUNT: usize = 3; //core::mem::variant_count::<FlagKind>(); TODO use this instead when stable
+    pub const VARIANTS: [FlagKind; Self::VARIANT_COUNT] = [FlagKind::Help, FlagKind::File, FlagKind::Rev];
 
     pub fn kind(&self) -> FlagKind
     {
