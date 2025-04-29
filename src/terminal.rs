@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 fn is_kitty() -> bool
 {
     std::env::var("KITTY_WINDOW_ID").is_ok()
@@ -22,5 +24,5 @@ fn is_iterm() -> bool
 
 pub fn supports_colored_underline() -> bool
 {
-    is_kitty() || is_vte() || is_mintty() || is_iterm()
+    false //is_kitty() || is_vte() || is_mintty() || is_iterm()
 }

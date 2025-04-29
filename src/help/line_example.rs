@@ -18,8 +18,8 @@ impl Display for LineExample
         let Self {team, points, effect} = self;
         let mut align = ALIGN;
 
-        let team = style::team(format!("{team}:"));
-        let points = style::points(&**points);
+        let team = style::team_line(format!("{team}:"));
+        let points = style::points_line(&**points);
 
         align = align.saturating_sub(team.len() + points.len() + 2);
         write!(f, "{team} {points}")?;

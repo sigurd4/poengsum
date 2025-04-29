@@ -9,34 +9,34 @@ const CLIMB_UP_COLOR: Color = Color::Green;
 const CLIMB_DOWN_COLOR: Color = Color::Red;
 
 const PLACE_COLOR: Color = Color::White;
-const TEAM_COLOR: Color = Color::RGB(255/2, 255/2, 0);
-const ROUND_COLOR: Color = Color::White;
+const TEAM_COLOR: Color = Color::White;
+const POINTS_COLOR: Color = Color::White;
 
 const EXE_COLOR: Color = Color::Blue;
 const ARG_COLOR: Color = Color::Cyan;
 
 const INFO_COLOR: Color = Color::Fixed(8);
-const ERROR_COLOR: Color = Color::Red;
+const ERROR_COLOR: Color = Color::Fixed(1);
 //const WARNING_COLOR: Color = Color::Yellow;
 const LINE_COLOR: Color = Color::Fixed(8);
+const TEAM_LINE_COLOR: Color = Color::Fixed(221);
+const POINTS_LINE_COLOR: Color = Color::White;
 
 pub fn place(place: usize) -> ANSIString<'static>
 {
     PLACE_COLOR.paint(format!("{place}."))
 }
-
 pub fn team<'a, T>(input: T) -> ANSIString<'a>
 where
     T: Into<Cow<'a, str>>
 {
     TEAM_COLOR.paint(input)
 }
-
 pub fn points<'a, T>(input: T) -> ANSIString<'a>
 where
     T: Into<Cow<'a, str>>
 {
-    ROUND_COLOR.paint(input)
+    POINTS_COLOR.paint(input)
 }
 
 pub fn header<'a, T>(input: T) -> ANSIString<'a>
@@ -94,7 +94,7 @@ fn severity_color(severity: Severity) -> Color
 
 pub fn syntax_arrow(offset: usize, severity: Severity) -> ANSIString<'static>
 {
-    severity_color(severity).paint(format!("{v:>offset$}", v = "v"))
+    severity_color(severity).paint(format!("{offset}v", offset = " ".repeat(offset)))
 }
 
 pub fn line<'a, T>(input: T) -> ANSIString<'a>
@@ -115,11 +115,23 @@ where
         _ => None
     }
     {
-        const SUFFIX: &str = "\x1b[58m";
-        line(format!("{prefix}{input}{SUFFIX}", input = input.into()))
+        const SUFFIX: &str = "\x1b[59m";
+        format!("{prefix}{input}{SUFFIX}", input = input.into()).into()
     }
     else
     {
         color.underline().paint(input)
     }
+}
+pub fn team_line<'a, T>(input: T) -> ANSIString<'a>
+where
+    T: Into<Cow<'a, str>>
+{
+    TEAM_LINE_COLOR.paint(input)
+}
+pub fn points_line<'a, T>(input: T) -> ANSIString<'a>
+where
+    T: Into<Cow<'a, str>>
+{
+    POINTS_LINE_COLOR.paint(input)
 }

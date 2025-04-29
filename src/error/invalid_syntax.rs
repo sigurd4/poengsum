@@ -78,7 +78,7 @@ impl InvalidSyntax
                 let span = &line[col.clone()];
                 let col_start = col.start;
                 Msg {
-                    msg: format!("Unable to parse points for team \"{team}\" for round {round} at line {row}, collumn {col_start} \"{span}\": {error}\n\n{row}| {line}\n\n").into_boxed_str(),
+                    msg: format!("Unable to parse points for team \"{team}\" for round {round} at line {row}, collumn {col_start} \"{span}\"").into_boxed_str(),
                     error: Some(error),
                     line: Some(OffendingLine {
                         file,

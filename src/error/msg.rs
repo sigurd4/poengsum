@@ -46,24 +46,29 @@ impl Display for OffendingLine<'_>
 
         if let Some(line) = *line
         {
-            let mut line = line.to_string();
             let row = format!("{row} | ");
-            let (col, [line_before, line, line_after]) = match col
+            let [line_before, line, line_after] = match col
             {
                 None => {
-                    (0, ["", &line, ""])
+                    ["", line, ""]
                 },
                 Some(Range { start, end }) => {
-                    line.push(' ');
                     let end = (*end).min(line.len());
                     let start = (*start).min(end);
-                    let (line_before, line) = line.split_at(start);
-                    let (line, line_after) = line.split_at(end);
 
-                    (start, [line_before, line, line_after])
+                    let (line_before, line) = line.split_at_checked(start).unwrap_or((line, ""));
+                    if line.is_empty() || start == end
+                    {
+                        [line_before, " ", line]
+                    }
+                    else
+                    {
+                        let (line, line_after) = line.split_at_checked(end - start).unwrap_or((line, ""));
+                        [line_before, line, line_after]
+                    }
                 }
             };
-            write!(f, "\n{arrow}\n{row}", arrow = style::syntax_arrow(col + row.len() + 1, *severity))?;
+            write!(f, "\n{arrow}\n{row}", arrow = style::syntax_arrow(line_before.chars().count() + row.chars().count(), *severity))?;
 
             let lines = [
                 style::line(line_before),
