@@ -21,9 +21,13 @@ impl Display for FlagHelp
             flag: *flag
         };
 
-        let help = style::info(flag.help(exe));
+        write!(f, "{usage}")?;
 
-        write!(f, "{usage}\n\n{help}")?;
+        let help = style::info(flag.help(exe));
+        if !help.is_empty()
+        {
+            write!(f, "\n\n{help}")?;
+        }
 
         Ok(())
     }
