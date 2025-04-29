@@ -88,13 +88,11 @@ mod tests
         match crate::run(args)
         {
             // These are allowed to fail in tests
-            Err(
-                error @ Error::ShowHelp { help: _ }
-                | error @ Error::InsufficientData { error: _ }
-            ) => {
+            Err(error @ Error::ShowHelp { help: _ } | error @ Error::InsufficientData { error: _ }) =>
+            {
                 eprintln!("{error}");
                 Ok(())
-            },
+            }
             result => result
         }
     }
@@ -116,9 +114,7 @@ mod tests
         crate::run(["poengsum", "--file", "poengsum.txt"].into_iter().map(String::from))?;
         crate::run(["poengsum", "-f", "poengsum.txt"].into_iter().map(String::from))?;
 
-        for example in (ArgUsage {
-            exe: "poengsum"
-        }).examples()
+        for example in (ArgUsage { exe: "poengsum" }).examples()
         {
             test(example.into_args())?;
         }
