@@ -87,6 +87,7 @@ mod tests
     {
         match crate::run(args)
         {
+            // These are allowed to fail in tests
             Err(
                 error @ Error::ShowHelp { help: _ }
                 | error @ Error::InsufficientData { error: _ }
