@@ -29,6 +29,14 @@ impl Display for Score
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
     {
         let Self { team, points, place, climb, uid: _ } = self;
+        let points = if *points == -0.0
+        {
+            0.0
+        }
+        else
+        {
+            *points
+        };
         write!(f, "{place} {team} {points}{climb}",
             place = style::place(*place),
             team = style::team(format!("{team}:", team = &**team).as_str()),
