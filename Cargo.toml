@@ -12,5 +12,5 @@ categories = ["command-line-utilities"]
 [dependencies]
 thiserror = "2.0.12"
 moddef = "0.3.0"
-ansi_term = "0.12.1"
+ansiterm = "0.12.2"
 supports-unicode = "3.0.0"

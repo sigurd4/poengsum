@@ -1,7 +1,7 @@
 use core::cmp::Ordering;
 use std::borrow::Cow;
 
-use ansi_term::{ANSIString, Color, Style};
+use ansiterm::{ANSIString, Color, Style};
 
 use crate::{error::Severity, terminal};
 
