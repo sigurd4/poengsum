@@ -13,7 +13,7 @@ pub enum InsufficientData
 
 impl InsufficientData
 {
-    pub fn msg(&self) -> Msg
+    pub fn msg(&self) -> Msg<'static>
     {
         match self
         {

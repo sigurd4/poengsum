@@ -212,15 +212,12 @@ impl Call
         };
 
         let check = |start: Option<usize>, end: Option<usize>| {
-            if let (Some(start), Some(end)) = (start, end)
+            if let (Some(start), Some(end)) = (start, end) && start > end
             {
-                if start > end
-                {
-                    return Err(InvalidArg::NotInOrder {
-                        start: start + 1,
-                        end: end + 1
-                    })
-                }
+                return Err(InvalidArg::NotInOrder {
+                    start: start + 1,
+                    end: end + 1
+                })
             }
 
             Ok(())

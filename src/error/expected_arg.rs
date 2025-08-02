@@ -32,7 +32,7 @@ impl ExpectedArg
         }
     }
 
-    pub fn msg(&self, exe: &'static str, no: usize) -> Msg
+    pub fn msg(&self, exe: &'static str, no: usize) -> Msg<'static>
     {
         match self
         {

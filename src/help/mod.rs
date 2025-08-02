@@ -181,7 +181,7 @@ impl Display for Help
 
 impl Help
 {
-    pub fn msg(&self) -> Msg
+    pub fn msg(&self) -> Msg<'_>
     {
         let mut msg = "Showing help".to_string();
         let mut flags = self.flags.iter();

@@ -53,7 +53,7 @@ impl Error
         format!("{no}{suffix}").into_boxed_str()
     }
 
-    fn msg(&self) -> Msg
+    fn msg(&self) -> Msg<'_>
     {
         match self
         {

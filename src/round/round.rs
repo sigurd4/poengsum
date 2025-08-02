@@ -33,8 +33,8 @@ impl Round
             Round::Range { start, end } => {
                 let check_or = |round: Option<usize>, or: usize| match round
                 {
-                    None => Ok(or),
-                    Some(round) => check(round)
+                    Some(round) => check(round),
+                    None => Ok(or)
                 };
 
                 let start = check_or(start, 0)?;

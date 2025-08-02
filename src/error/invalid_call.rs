@@ -14,7 +14,7 @@ pub enum InvalidCall
 
 impl InvalidCall
 {
-    pub fn msg(&self, exe: &'static str, no: usize) -> Msg
+    pub fn msg(&self, exe: &'static str, no: usize) -> Msg<'_>
     {
         match self
         {
